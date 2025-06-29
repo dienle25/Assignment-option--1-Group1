@@ -54,6 +54,10 @@ class Event:
 
 # --- Nhóm chức năng: Quản lý Người dùng (Dành cho TV3) ---
 
+#viêt hàm tính tổng:
+def tinh_tong(a,b):
+    return a +b
+
 def register(username: str, password: str, role: str) -> bool:
     """
     (Backend - TV3) Đăng ký một người dùng mới.
