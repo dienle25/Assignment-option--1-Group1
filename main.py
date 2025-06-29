@@ -57,8 +57,8 @@ class Event:
 def tinh_tong_bang_d(a,b):
     a = int(a)
     b = int(b)
-    d = int(d)
-    return a +b + d
+    f = int(f)
+    return a +b + f
 
 def register(username: str, password: str, role: str) -> bool:
     """
