@@ -9,6 +9,7 @@ import uuid
 # ==============================================================================
 a = 10
 b = 20
+c = 0
 # --- Các hàm xử lý file ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, 'data')
