@@ -57,9 +57,9 @@ class Event:
 def tinh_tong_bang_d(a,b):
     a = int(a)
     b = int(b)
-    c = int(c)
+    d = int(d)
     return a +b + c
-
+    
 def register(username: str, password: str, role: str) -> bool:
     """
     (Backend - TV3) Đăng ký một người dùng mới.
