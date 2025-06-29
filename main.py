@@ -177,20 +177,146 @@ def export_to_csv():
 
 
 # ==============================================================================
+# # ==============================================================================
 # PHẦN 4: CÁC HÀM GIAO DIỆN & HÀM CHÍNH (Nhóm UI/UX lấp đầy)
 # ==============================================================================
 
-def show_admin_menu(current_user):
-    """(UI/UX - TV5) Hiển thị và xử lý menu cho Admin."""
-    # TODO: TV5 sẽ viết code giao diện vào đây.
+# --- Nhóm hàm xử lý giao diện cho Admin (Dành cho TV5) ---
+
+def handle_create_event():
+    """(UI/UX - TV5) Xử lý luồng tạo sự kiện mới."""
+    print("\n--- Tạo sự kiện mới ---")
+    # TODO: TV5 viết code để:
+    # 1. Lấy input: Tên, Ngày, Sức chứa từ người dùng.
+    # 2. Xác thực đầu vào (ví dụ: sức chứa phải là số).
+    # 3. Gọi hàm backend: create_event(name, date, capacity)
+    # 4. In ra thông báo thành công hoặc thất bại.
     pass
 
-# ... Thêm các hàm menu rỗng khác ở đây ...
+def handle_update_event():
+    """(UI/UX - TV5) Xử lý luồng cập nhật sự kiện."""
+    # TODO: TV5 viết code để:
+    # 1. Lấy input: event_id cần cập nhật.
+    # 2. Lấy input: các thông tin mới (tên mới, sức chứa mới...).
+    # 3. Gọi hàm backend: update_event(event_id, new_data)
+    # 4. In ra thông báo.
+    pass
+
+# --- Nhóm hàm xử lý giao diện cho Admin & các vai trò khác (Dành cho TV6) ---
+
+def handle_view_all_events():
+    """(UI/UX - TV6) Xử lý luồng xem tất cả sự kiện."""
+    print("\n--- Danh sách tất cả sự kiện ---")
+    # TODO: TV6 viết code để:
+    # 1. Gọi hàm backend: all_events = view_all_events()
+    # 2. Dùng vòng lặp for để duyệt qua danh sách all_events.
+    # 3. In thông tin mỗi sự kiện ra màn hình theo một định dạng đẹp mắt.
+    pass
+
+def handle_delete_event():
+    """(UI/UX - TV6) Xử lý luồng xóa sự kiện."""
+    # TODO: TV6 viết code để:
+    # 1. Lấy input: event_id cần xóa.
+    # 2. In ra một câu hỏi xác nhận (Bạn có chắc không?).
+    # 3. Nếu người dùng xác nhận, gọi hàm backend: delete_event(event_id)
+    # 4. In ra thông báo.
+    pass
+
+# --- Các hàm menu chính ---
+
+def show_admin_menu(current_user):
+    """(UI/UX - TV5) Hiển thị và điều hướng menu cho Admin."""
+    while True:
+        print(f"\n--- Menu Admin (Đăng nhập với tài khoản: {current_user.username}) ---")
+        print("1. Tạo sự kiện mới")
+        print("2. Xem tất cả sự kiện")
+        print("3. Cập nhật sự kiện")
+        print("4. Xóa sự kiện")
+        print("0. Đăng xuất")
+        
+        choice = input("Vui lòng nhập lựa chọn của bạn: ")
+        
+        if choice == '1':
+            handle_create_event()
+        elif choice == '2':
+            handle_view_all_events()
+        elif choice == '3':
+            handle_update_event()
+        elif choice == '4':
+            handle_delete_event()
+        elif choice == '0':
+            print("Đang đăng xuất...")
+            break
+        else:
+            print("Lựa chọn không hợp lệ, vui lòng thử lại.")
+
+def show_student_menu(current_user):
+    """(UI/UX - TV6) Hiển thị và điều hướng menu cho Student."""
+    # TODO: TV6 sẽ xây dựng menu tương tự như menu Admin cho các chức năng của Student
+    # (Tìm kiếm, Đăng ký, Xem sự kiện đã đăng ký)
+    print(f"\n--- Menu Sinh viên (Chào mừng, {current_user.username}) ---")
+    print("Chức năng đang được xây dựng.")
+    pass
+
+def show_organizer_menu(current_user):
+    """(UI/UX - TV5) Hiển thị và điều hướng menu cho Event Organizer."""
+    # TODO: TV5 sẽ xây dựng menu cho các chức năng của Event Organizer
+    print(f"\n--- Menu Nhà tổ chức (Chào mừng, {current_user.username}) ---")
+    print("Chức năng đang được xây dựng.")
+    pass
+
+# --- Hàm chạy chính của chương trình ---
 
 def main():
-    """Hàm chính để chạy chương trình."""
-    print("--- Chào mừng đến với Hệ thống Quản lý Sự kiện (Phiên bản Khung) ---")
-    # Vòng lặp chính sẽ được phát triển sau.
+    """Hàm chính để điều khiển toàn bộ luồng của ứng dụng."""
+    current_user = None
+    
+    # Tạo sẵn tài khoản admin để dễ dàng kiểm tra
+    users = load_data(USERS_FILE)
+    if not any(user['username'] == 'admin' for user in users):
+        # Giả sử hàm register đã được TV3 hoàn thành
+        # register("admin", "123", "Admin")
+        # Do hàm register đang rỗng, ta tạo thủ công để test
+        save_data(USERS_FILE, [{"username": "admin", "password": "123", "role": "Admin"}])
+
+    while True:
+        if not current_user:
+            print("\n--- HỆ THỐNG QUẢN LÝ SỰ KIỆN ---")
+            print("1. Đăng nhập")
+            print("2. Đăng ký")
+            print("0. Thoát chương trình")
+            
+            choice = input("Vui lòng nhập lựa chọn của bạn: ")
+            
+            if choice == '1':
+                username = input("Tên đăng nhập: ")
+                password = input("Mật khẩu: ")
+                current_user = login(username, password) # Gọi hàm login của Backend
+                if not current_user:
+                    print("Tên đăng nhập hoặc mật khẩu không đúng.")
+            
+            elif choice == '2':
+                # TODO: TV5 hoặc TV6 sẽ xây dựng luồng đăng ký chi tiết ở đây
+                print("Chức năng đang được xây dựng.")
+                pass
+
+            elif choice == '0':
+                print("Cảm ơn đã sử dụng chương trình!")
+                break
+            else:
+                print("Lựa chọn không hợp lệ.")
+        
+        else:
+            # Phân luồng dựa trên vai trò của người dùng
+            if current_user.role == "Admin":
+                show_admin_menu(current_user)
+            elif current_user.role == "Student":
+                show_student_menu(current_user)
+            elif current_user.role == "Event Organizer":
+                show_organizer_menu(current_user)
+            
+            # Sau khi người dùng đăng xuất từ menu con, đặt lại current_user để quay về menu chính
+            current_user = None 
 
 if __name__ == "__main__":
     main()
