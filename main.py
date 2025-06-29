@@ -186,6 +186,8 @@ def export_to_csv():
 # ==============================================================================
 
 # --- Nhóm hàm xử lý giao diện cho Admin (Dành cho TV5) ---
+def tinh_tong(a,b):
+    return a + b
 
 def handle_create_event():
     """(UI/UX - TV5) Xử lý luồng tạo sự kiện mới."""
