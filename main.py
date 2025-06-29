@@ -49,31 +49,131 @@ class Event:
         return {"event_id": self.event_id, "name": self.name, "date": self.date, "capacity": self.capacity, "attendees": self.attendees}
 
 # ==============================================================================
-# PHẦN 3: CÁC HÀM QUẢN LÝ LOGIC (Các hàm rỗng để nhóm lấp đầy)
+# PHẦN 3: CÁC HÀM QUẢN LÝ LOGIC (BẢN THIẾT KẾ ĐẦY ĐỦ CHO SPRINT 1)
 # ==============================================================================
-def tinh_tong(a, b):
-    return a + b
-def tinh_hieu(a,b):
-    return a-b
 
+# --- Nhóm chức năng: Quản lý Người dùng (Dành cho TV3) ---
 
 def register(username: str, password: str, role: str) -> bool:
-    """(Backend - TV3) Đăng ký người dùng mới."""
+    """
+    (Backend - TV3) Đăng ký một người dùng mới.
+    - Logic: Kiểm tra xem username đã tồn tại chưa. Nếu chưa, thêm user mới vào users.json.
+    - Trả về: True nếu thành công, False nếu tên người dùng đã tồn tại.
+    """
     # TODO: TV3 sẽ viết code logic vào đây.
     pass
 
 def login(username: str, password: str) -> User | None:
-    """(Backend - TV3) Xác thực đăng nhập."""
+    """
+    (Backend - TV3) Xác thực đăng nhập.
+    - Logic: Tìm người dùng có username và password khớp.
+    - Trả về: Đối tượng User nếu tìm thấy, ngược lại trả về None.
+    """
     # TODO: TV3 sẽ viết code logic vào đây.
     pass
 
+# --- Nhóm chức năng: Quản lý Sự kiện của ADMIN (Dành cho TV4) ---
+
 def create_event(name: str, date: str, capacity: int) -> Event | None:
-    """(Backend - TV4) Tạo sự kiện mới."""
+    """
+    (Backend - TV4) Tạo một sự kiện mới.
+    - Logic: Tạo đối tượng Event mới, thêm vào events.json.
+    - Trả về: Đối tượng Event vừa tạo.
+    """
     # TODO: TV4 sẽ viết code logic vào đây.
     pass
 
-# ... Thêm các hàm rỗng khác cho update, delete, v.v...
-#def1,def2,def3, .... how?
+def update_event(event_id: str, new_data: dict) -> bool:
+    """
+    (Backend - TV4) Cập nhật thông tin sự kiện.
+    - Logic: Tìm sự kiện theo ID, cập nhật các trường trong new_data, lưu lại.
+    - Trả về: True nếu cập nhật thành công, False nếu không tìm thấy ID.
+    """
+    # TODO: TV4 sẽ viết code logic vào đây.
+    pass
+
+def delete_event(event_id: str) -> bool:
+    """
+    (Backend - TV4) Xóa một sự kiện.
+    - Logic: Tìm và xóa sự kiện khỏi danh sách trong events.json.
+    - Trả về: True nếu xóa thành công, False nếu không tìm thấy ID.
+    """
+    # TODO: TV4 sẽ viết code logic vào đây.
+    pass
+
+def view_all_events() -> list[Event]:
+    """
+    (Backend - TV4) Lấy danh sách tất cả sự kiện.
+    - Logic: Đọc toàn bộ file events.json và chuyển đổi thành danh sách các đối tượng Event.
+    - Trả về: Một danh sách các đối tượng Event.
+    """
+    # TODO: TV4 sẽ viết code logic vào đây.
+    return []
+
+# --- Nhóm chức năng: Chức năng của STUDENT (Dành cho TV3) ---
+
+def search_events(keyword: str) -> list[Event]:
+    """
+    (Backend - TV3) Tìm kiếm sự kiện theo tên.
+    - Logic: Duyệt qua tất cả sự kiện, trả về danh sách các sự kiện có tên chứa keyword (không phân biệt hoa thường).
+    - Trả về: Một danh sách các đối tượng Event tìm thấy.
+    """
+    # TODO: TV3 sẽ viết code logic vào đây.
+    return []
+
+def register_for_event(username: str, event_id: str) -> tuple[bool, str]:
+    """
+    (Backend - TV3 & TV2) Đăng ký một người dùng cho một sự kiện.
+    - Logic (Phức tạp):
+        1. Kiểm tra sự kiện có tồn tại không.
+        2. Kiểm tra sự kiện còn chỗ không (dựa vào capacity).
+        3. Kiểm tra người dùng này đã đăng ký sự kiện này trước đó chưa (ngăn chặn trùng lặp).
+        4. Nếu ổn, thêm username vào danh sách 'attendees' của sự kiện và lưu lại.
+    - Trả về: Một tuple (bool, str) chứa trạng thái và tin nhắn. Ví dụ: (True, "Đăng ký thành công!"), (False, "Sự kiện đã đầy.").
+    """
+    # TODO: TV3 sẽ viết code logic vào đây, có thể cần sự hỗ trợ của TV2.
+    pass
+
+def view_registered_events(username: str) -> list[Event]:
+    """
+
+    (Backend - TV3) Xem các sự kiện mà một người dùng đã đăng ký.
+    - Logic: Duyệt qua tất cả sự kiện, trả về danh sách các sự kiện mà trong danh sách 'attendees' có chứa username.
+    - Trả về: Một danh sách các đối tượng Event.
+    """
+    # TODO: TV3 sẽ viết code logic vào đây.
+    return []
+
+# --- Nhóm chức năng: Chức năng của EVENT ORGANIZER (Dành cho TV4) ---
+
+def view_attendees_for_event(event_id: str) -> list[str] | None:
+    """
+    (Backend - TV4) Xem danh sách người tham dự của một sự kiện cụ thể.
+    - Logic: Tìm sự kiện theo ID và trả về danh sách 'attendees' của nó.
+    - Trả về: Một danh sách các username, hoặc None nếu không tìm thấy sự kiện.
+    """
+    # TODO: TV4 sẽ viết code logic vào đây.
+    pass
+
+# --- Nhóm chức năng: Báo cáo & Thống kê (Dành cho TV2) ---
+
+def calculate_total_attendees() -> int:
+    """(Backend - TV2) Tính tổng số lượt đăng ký trên tất cả các sự kiện."""
+    # TODO: TV2 sẽ viết code logic vào đây.
+    pass
+
+def find_events_by_attendance() -> dict:
+    """
+    (Backend - TV2) Tìm sự kiện có số người tham dự cao nhất và thấp nhất.
+    - Trả về: Một dictionary, ví dụ: {"highest": {"name": "Tên event", "count": 100}, "lowest": ...}
+    """
+    # TODO: TV2 sẽ viết code logic vào đây.
+    pass
+
+def export_to_csv():
+    """(Backend - TV2) Xuất báo cáo ra file CSV."""
+    # TODO: TV2 sẽ viết code logic vào đây.
+    pass
 
 
 # ==============================================================================
