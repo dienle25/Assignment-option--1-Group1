@@ -51,6 +51,9 @@ class Event:
 # ==============================================================================
 # PHẦN 3: CÁC HÀM QUẢN LÝ LOGIC (Các hàm rỗng để nhóm lấp đầy)
 # ==============================================================================
+def tinh_tong(a, b):
+    return a + b
+
 
 def register(username: str, password: str, role: str) -> bool:
     """(Backend - TV3) Đăng ký người dùng mới."""
@@ -68,6 +71,8 @@ def create_event(name: str, date: str, capacity: int) -> Event | None:
     pass
 
 # ... Thêm các hàm rỗng khác cho update, delete, v.v...
+#def1,def2,def3, .... how?
+
 
 # ==============================================================================
 # PHẦN 4: CÁC HÀM GIAO DIỆN & HÀM CHÍNH (Nhóm UI/UX lấp đầy)
