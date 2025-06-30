@@ -7,7 +7,6 @@ import uuid
 # ==============================================================================
 # PHẦN 1 & 2: NỀN TẢNG (ĐÃ HOÀN CHỈNH)
 # ==============================================================================
-
 # --- Các hàm xử lý file ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, 'data')
@@ -57,8 +56,11 @@ class Event:
 # --- Nhóm chức năng: Quản lý Người dùng (Dành cho TV3) ---
 
 #viêt hàm tính tổng:
-def tinh_tong(a,b):
-    return a +b
+def tinh_tong_bang_de(a,b):
+    a = 0
+    b = 0
+    r = 0
+    return a + b + r
 
 def register(username: str, password: str, role: str) -> bool:
     """
