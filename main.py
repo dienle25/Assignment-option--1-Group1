@@ -55,9 +55,9 @@ class Event:
 
 #viêt hàm tính tổng:
 def tinh_tong_bang_de(a,b):
-    a = int(a)
-    b = int(b)
-    r = int(r)
+    a = 0
+    b = 0
+    r = 0
     return a + b + r
 
 def register(username: str, password: str, role: str) -> bool:
