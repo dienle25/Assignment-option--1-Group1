@@ -23,7 +23,7 @@ def load_data(file_path):
         with open(file_path, 'w', encoding='utf-8') as f:
             json.dump([], f)
         return []
-
+print("Tong 2 so:")
 def tong():
     return
 def save_data(file_path, data):
