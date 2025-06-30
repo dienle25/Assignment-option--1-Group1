@@ -54,11 +54,11 @@ class Event:
 # --- Nhóm chức năng: Quản lý Người dùng (Dành cho TV3) ---
 
 #viêt hàm tính tổng:
-def tinh_tong_bang_d(a,b):
+def tinh_tong_bang_de(a,b):
     a = int(a)
     b = int(b)
-    f = int(f)
-    return a +b + f
+    r = int(r)
+    return a + b + r
 
 def register(username: str, password: str, role: str) -> bool:
     """
