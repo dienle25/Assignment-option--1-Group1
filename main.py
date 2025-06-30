@@ -119,7 +119,7 @@ def view_all_events() -> list[Event]:
     return []
 
 # --- Nhóm chức năng: Chức năng của STUDENT (Dành cho TV3) ---
-
+print("Chức năng của STUDENT (Dành cho TV3)")
 def search_events(keyword: str) -> list[Event]:
     """
     (Backend - TV3) Tìm kiếm sự kiện theo tên.
