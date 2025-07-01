@@ -63,22 +63,33 @@ def tinh_tong_bang_de(a,b):
     return a + b + r
 
 def register(username: str, password: str, role: str) -> bool:
-    """
-    (Backend - TV3) Đăng ký một người dùng mới.
-    - Logic: Kiểm tra xem username đã tồn tại chưa. Nếu chưa, thêm user mới vào users.json.
-    - Trả về: True nếu thành công, False nếu tên người dùng đã tồn tại.
-    """
-    # TODO: TV3 sẽ viết code logic vào đây.
-    pass
+    users = load_data(USERS_FILE)
+    
+    if username.strip() =='':
+        return False
+    
+    for user in users:
+        if user['username'] == username:
+            return False
+        
+    if len(password) < 6:
+        return False
+    
+    role = role.strip().lower()
+    if role not in ['admin', 'organizer', 'student']:
+        return False
+    
+    new_user = {'username': username, 'password':password, 'role': role.lower()}
+    save_data(USERS_FILE, users)
+    return True
 
 def login(username: str, password: str) -> User | None:
-    """
-    (Backend - TV3) Xác thực đăng nhập.
-    - Logic: Tìm người dùng có username và password khớp.
-    - Trả về: Đối tượng User nếu tìm thấy, ngược lại trả về None.
-    """
-    # TODO: TV3 sẽ viết code logic vào đây.
-    pass
+    users = load_data(USERS_FILE)
+
+    for user  in users:
+        if user['username'] == username and user['password'] == password:
+            return User(user['username'], user['password'], user['role'])
+    return None
 
 # --- Nhóm chức năng: Quản lý Sự kiện của ADMIN (Dành cho TV4) ---
 
