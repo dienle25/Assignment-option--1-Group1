@@ -3,7 +3,6 @@
 import json
 import os
 import uuid
-print("I LOVE U" )
 # ==============================================================================
 # PHẦN 1 & 2: NỀN TẢNG (ĐÃ HOÀN CHỈNH)
 # ==============================================================================
@@ -204,26 +203,39 @@ def export_to_csv():
 # ==============================================================================
 
 # --- Nhóm hàm xử lý giao diện cho Admin (Dành cho TV5) ---
-def show_admin_menu():
+def dang_nhap():
     while True:
-        print("\nAdmin Menu:")
-        print("1. Tạo tại khoảng")
-        print("2. Xem nội dung ")
-        print("3.Sửa đổi tài khoảng")
-        print("4. Quay lại menu chính ")
-        print("5. Thoát")
-        choice = input (" nhập lựa chọn của bạn:")
-        if choice == '1':
-            print("Tạo tài khoảng ")
-        elif choice =='2':
-            print("xem nội dung")
-        elif choice =='3':
-            print("Sửa đổi tài khoảng")
-        elif choice =='4':
-            print("Quay lại menu chính")
-        elif choice =='5':
-            print("Thoát")
+        print("=== MENU ===")
+        print("1. Đăng nhập")
+        print("2. Đăng ký")
+        print("0. Thoát")
+        
+        choice = input("Chọn chức năng (0-2): ")
 
+        if choice == "1":
+            result = login()
+            if result:
+                print("Đăng nhập thành công!")
+            else:
+                print("Đăng nhập thất bại. Vui lòng thử lại.")
+        elif choice == "2":
+            register()
+            print("Đăng ký thành công.")
+        elif choice == "0":
+            print("Tạm biệt!")
+            break
+        else:
+            print("Lựa chọn không hợp lệ. Vui lòng chọn lại.")
+def login():
+    username = input("Tên đăng nhập: ")
+    password = input("Mật khẩu: ")
+    return username == "admin" and password == "123"
+def register():
+    username = input("Chọn tên đăng nhập: ")
+    password = input("Chọn mật khẩu: ")
+    print(f"Tài khoản {username} đã được tạo.")
+if __name__ == "__dang_nhap__":
+    dang_nhap()
 def handle_create_event():
     """(UI/UX - TV5) Xử lý luồng tạo sự kiện mới."""
     print("\n--- Tạo sự kiện mới ---")
