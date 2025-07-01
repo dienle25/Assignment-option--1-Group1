@@ -83,13 +83,11 @@ def login(username: str, password: str) -> User | None:
 # --- Nhóm chức năng: Quản lý Sự kiện của ADMIN (Dành cho TV4) ---
 
 def create_event(name: str, date: str, capacity: int) -> Event | None:
-    """
-    (Backend - TV4) Tạo một sự kiện mới.
-    - Logic: Tạo đối tượng Event mới, thêm vào events.json.
-    - Trả về: Đối tượng Event vừa tạo.
-    """
-    # TODO: TV4 sẽ viết code logic vào đây.
-    pass
+    events = load_data(EVENTS_FILE)
+    new_event = Event(name=name, date=date, capacity=capacity)
+    events.append(new_event.to_dict())
+    save_data(EVENTS_FILE, events)
+    return new_event
 
 def update_event(event_id: str, new_data: dict) -> bool:
     """
@@ -97,8 +95,18 @@ def update_event(event_id: str, new_data: dict) -> bool:
     - Logic: Tìm sự kiện theo ID, cập nhật các trường trong new_data, lưu lại.
     - Trả về: True nếu cập nhật thành công, False nếu không tìm thấy ID.
     """
-    # TODO: TV4 sẽ viết code logic vào đây.
-    pass
+    events = load_data(EVENTS_FILE)
+    updated = False
+    for event in events:
+        if event['event_id'] == event_id:
+            for key, value in new_data.items():
+                if key in event:
+                    event[key] = value
+            updated = True
+            break
+
+    save_data(EVENTS_FILE, events)
+    return updated
 
 def delete_event(event_id: str) -> bool:
     """
@@ -110,13 +118,8 @@ def delete_event(event_id: str) -> bool:
     pass
 
 def view_all_events() -> list[Event]:
-    """
-    (Backend - TV4) Lấy danh sách tất cả sự kiện.
-    - Logic: Đọc toàn bộ file events.json và chuyển đổi thành danh sách các đối tượng Event.
-    - Trả về: Một danh sách các đối tượng Event.
-    """
-    # TODO: TV4 sẽ viết code logic vào đây.
-    return []
+    events_data = load_data(EVENTS_FILE)
+    return [Event(**event_dict) for event_dict in events_data]
 
 # --- Nhóm chức năng: Chức năng của STUDENT (Dành cho TV3) ---
 print("Chức năng của STUDENT (Dành cho TV3)")

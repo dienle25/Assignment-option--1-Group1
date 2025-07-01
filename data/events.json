@@ -1,1 +1,16 @@
-[]
+[
+    {
+        "event_id": "5fc06f2f-1d66-421c-9ab0-0295f2c15020",
+        "name": "Hội thảo AI",
+        "date": "2025-07-15",
+        "capacity": 100,
+        "attendees": []
+    },
+    {
+        "event_id": "c6c72a4d-b37a-403b-bd21-a3fbfb62133f",
+        "name": "Hackathon Python",
+        "date": "2025-08-01",
+        "capacity": 80,
+        "attendees": []
+    }
+]
