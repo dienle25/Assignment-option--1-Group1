@@ -141,13 +141,20 @@ def view_all_events() -> list[Event]:
 # --- Nhóm chức năng: Chức năng của STUDENT (Dành cho TV3) ---
 print("Chức năng của STUDENT (Dành cho TV3)")
 def search_events(keyword: str) -> list[Event]:
-    """
-    (Backend - TV3) Tìm kiếm sự kiện theo tên.
-    - Logic: Duyệt qua tất cả sự kiện, trả về danh sách các sự kiện có tên chứa keyword (không phân biệt hoa thường).
-    - Trả về: Một danh sách các đối tượng Event tìm thấy.
-    """
-    # TODO: TV3 sẽ viết code logic vào đây.
-    return []
+    keyword = keyword.lower()
+    events_data = load_data(EVENTS_FILE)
+    matching_events = list()
+
+    for item in events_data: 
+        if (keyword in item['name'].lower()   
+            or keyword in item['date']
+            or keyword in item['capacity']
+            or keyword in item['event_id'].lower()
+            or keyword in str(item['attendees'].lower())):
+            #tạo đối tượng Event (trong class Event) và gán vào biến e
+            e = Event(name = item['name'], date = item['date'], capacity = item['capacity'], event_id = item['event_id'], attendees = item['attendees'])
+            matching_events.append(e)
+    return matching_events
 
 def register_for_event(username: str, event_id: str) -> tuple[bool, str]:
     """
