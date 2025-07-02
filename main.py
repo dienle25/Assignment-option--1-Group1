@@ -124,8 +124,15 @@ def delete_event(event_id: str) -> bool:
     - Logic: Tìm và xóa sự kiện khỏi danh sách trong events.json.
     - Trả về: True nếu xóa thành công, False nếu không tìm thấy ID.
     """
-    # TODO: TV4 sẽ viết code logic vào đây.
-    pass
+    deleted = False
+    events = load_data(EVENTS_FILE)  # Tải dữ liệu từ file JSON
+    for i, event in enumerate(events):
+        if event.get('event_id') == event_id:
+            del events[i]  # Xóa sự kiện tại vị trí i
+            deleted = True
+            break
+    save_data(EVENTS_FILE, events)  # Ghi lại dữ liệu mới vào file
+    return deleted
 
 def view_all_events() -> list[Event]:
     events_data = load_data(EVENTS_FILE)
