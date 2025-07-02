@@ -3,7 +3,6 @@
 import json
 import os
 import uuid
-print("I LOVE U" )
 # ==============================================================================
 # PHẦN 1 & 2: NỀN TẢNG (ĐÃ HOÀN CHỈNH)
 # ==============================================================================
@@ -63,22 +62,33 @@ def tinh_tong_bang_de(a,b):
     return a + b + r
 
 def register(username: str, password: str, role: str) -> bool:
-    """
-    (Backend - TV3) Đăng ký một người dùng mới.
-    - Logic: Kiểm tra xem username đã tồn tại chưa. Nếu chưa, thêm user mới vào users.json.
-    - Trả về: True nếu thành công, False nếu tên người dùng đã tồn tại.
-    """
-    # TODO: TV3 sẽ viết code logic vào đây.
-    pass
+    users = load_data(USERS_FILE)
+    
+    if username.strip() =='':
+        return False
+    
+    for user in users:
+        if user['username'] == username:
+            return False
+        
+    if len(password) < 6:
+        return False
+    
+    role = role.strip().lower()
+    if role not in ['admin', 'organizer', 'student']:
+        return False
+    
+    new_user = {'username': username, 'password':password, 'role': role.lower()}
+    save_data(USERS_FILE, users)
+    return True
 
 def login(username: str, password: str) -> User | None:
-    """
-    (Backend - TV3) Xác thực đăng nhập.
-    - Logic: Tìm người dùng có username và password khớp.
-    - Trả về: Đối tượng User nếu tìm thấy, ngược lại trả về None.
-    """
-    # TODO: TV3 sẽ viết code logic vào đây.
-    pass
+    users = load_data(USERS_FILE)
+
+    for user  in users:
+        if user['username'] == username and user['password'] == password:
+            return User(user['username'], user['password'], user['role'])
+    return None
 
 # --- Nhóm chức năng: Quản lý Sự kiện của ADMIN (Dành cho TV4) ---
 
@@ -114,8 +124,15 @@ def delete_event(event_id: str) -> bool:
     - Logic: Tìm và xóa sự kiện khỏi danh sách trong events.json.
     - Trả về: True nếu xóa thành công, False nếu không tìm thấy ID.
     """
-    # TODO: TV4 sẽ viết code logic vào đây.
-    pass
+    deleted = False
+    events = load_data(EVENTS_FILE)  # Tải dữ liệu từ file JSON
+    for i, event in enumerate(events):
+        if event.get('event_id') == event_id:
+            del events[i]  # Xóa sự kiện tại vị trí i
+            deleted = True
+            break
+    save_data(EVENTS_FILE, events)  # Ghi lại dữ liệu mới vào file
+    return deleted
 
 def view_all_events() -> list[Event]:
     events_data = load_data(EVENTS_FILE)
@@ -124,13 +141,20 @@ def view_all_events() -> list[Event]:
 # --- Nhóm chức năng: Chức năng của STUDENT (Dành cho TV3) ---
 print("Chức năng của STUDENT (Dành cho TV3)")
 def search_events(keyword: str) -> list[Event]:
-    """
-    (Backend - TV3) Tìm kiếm sự kiện theo tên.
-    - Logic: Duyệt qua tất cả sự kiện, trả về danh sách các sự kiện có tên chứa keyword (không phân biệt hoa thường).
-    - Trả về: Một danh sách các đối tượng Event tìm thấy.
-    """
-    # TODO: TV3 sẽ viết code logic vào đây.
-    return []
+    keyword = keyword.lower()
+    events_data = load_data(EVENTS_FILE)
+    matching_events = list()
+
+    for item in events_data: 
+        if (keyword in item['name'].lower()   
+            or keyword in item['date']
+            or keyword in item['capacity']
+            or keyword in item['event_id'].lower()
+            or keyword in str(item['attendees'].lower())):
+            #tạo đối tượng Event (trong class Event) và gán vào biến e
+            e = Event(name = item['name'], date = item['date'], capacity = item['capacity'], event_id = item['event_id'], attendees = item['attendees'])
+            matching_events.append(e)
+    return matching_events
 
 def register_for_event(username: str, event_id: str) -> tuple[bool, str]:
     """
@@ -193,26 +217,39 @@ def export_to_csv():
 # ==============================================================================
 
 # --- Nhóm hàm xử lý giao diện cho Admin (Dành cho TV5) ---
-def show_admin_menu():
+def dang_nhap():
     while True:
-        print("\nAdmin Menu:")
-        print("1. Tạo tại khoảng")
-        print("2. Xem nội dung ")
-        print("3.Sửa đổi tài khoảng")
-        print("4. Quay lại menu chính ")
-        print("5. Thoát")
-        choice = input (" nhập lựa chọn của bạn:")
-        if choice == '1':
-            print("Tạo tài khoảng ")
-        elif choice =='2':
-            print("xem nội dung")
-        elif choice =='3':
-            print("Sửa đổi tài khoảng")
-        elif choice =='4':
-            print("Quay lại menu chính")
-        elif choice =='5':
-            print("Thoát")
+        print("=== MENU ===")
+        print("1. Đăng nhập")
+        print("2. Đăng ký")
+        print("0. Thoát")
+        
+        choice = input("Chọn chức năng (0-2): ")
 
+        if choice == "1":
+            result = login()
+            if result:
+                print("Đăng nhập thành công!")
+            else:
+                print("Đăng nhập thất bại. Vui lòng thử lại.")
+        elif choice == "2":
+            register()
+            print("Đăng ký thành công.")
+        elif choice == "0":
+            print("Tạm biệt!")
+            break
+        else:
+            print("Lựa chọn không hợp lệ. Vui lòng chọn lại.")
+def login():
+    username = input("Tên đăng nhập: ")
+    password = input("Mật khẩu: ")
+    return username == "admin" and password == "123"
+def register():
+    username = input("Chọn tên đăng nhập: ")
+    password = input("Chọn mật khẩu: ")
+    print(f"Tài khoản {username} đã được tạo.")
+if __name__ == "__dang_nhap__":
+    dang_nhap()
 def handle_create_event():
     """(UI/UX - TV5) Xử lý luồng tạo sự kiện mới."""
     print("\n--- Tạo sự kiện mới ---")
