@@ -1,3 +1,4 @@
+
 # main.py - PHIÊN BẢN TẤT CẢ TRONG MỘT
 
 import json
@@ -167,7 +168,22 @@ def register_for_event(username: str, event_id: str) -> tuple[bool, str]:
     - Trả về: Một tuple (bool, str) chứa trạng thái và tin nhắn. Ví dụ: (True, "Đăng ký thành công!"), (False, "Sự kiện đã đầy.").
     """
     # TODO: TV3 sẽ viết code logic vào đây, có thể cần sự hỗ trợ của TV2.
-    pass
+    events  = load_data(EVENTS_FILE)
+
+    #Kiểm tra sự kiện có tồn tại không
+    for event in events:
+        if event['event_id'] == event_id:
+            #kiểm tra sự kiện còn chỗ không: so sánh số lượng ng đki và sức chứa tối đa
+            if len(event['attendees']) == event['capacity']:
+                return False, 'Sự kiện đã đầy.'
+            #ktra ng dùng đã đki sự kiện này trước đó chưa:
+            if username in event['attendees']:
+                return False, 'Bạn đã đăng kí sự kiện này rồi.'
+            #nếu chưa có thì thêm nào ds attendees và lưu lại
+            event['attendees'].append(username)
+            save_data(EVENTS_FILE, events)
+            return True, "Đăng kí thành công!"
+    return False, 'Không tìm thấy sự kiện.'
 
 def view_registered_events(username: str) -> list[Event]:
     """
