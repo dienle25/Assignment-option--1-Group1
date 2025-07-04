@@ -193,7 +193,15 @@ def view_registered_events(username: str) -> list[Event]:
     - Trả về: Một danh sách các đối tượng Event.
     """
     # TODO: TV3 sẽ viết code logic vào đây.
-    return []
+    events_data = load_data(EVENTS_FILE)
+    user_events = list()
+
+    for item in events_data:
+        if username in item['attendees']: #kiểm tra username có trong attendees hay không
+            #nếu có, tạo đối tượng Event (trong class Event) và gán vào biến e
+            e = Event(name=item['name'], date=item['date'], capacity=item['capacity'], event_id=item['event_id'], attendees=item['attendees'])
+            user_events.append(e)
+    return user_events
 
 # --- Nhóm chức năng: Chức năng của EVENT ORGANIZER (Dành cho TV4) ---
 
