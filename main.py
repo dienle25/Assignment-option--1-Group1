@@ -56,17 +56,21 @@ def register(username: str, password: str, role: str) -> bool:
     users = load_data(USERS_FILE)
 
     if username.strip() =='':
+        print('Tên đăng nhập không được để trống.')
         return False
     
     for user in users:
         if user['username'] == username:
+            print('Tên đăng nhập đã được đăng kí từ trước.')
             return False
         
     if len(password) < 6:
+        print('Mật khẩu không được ít hơn 6 kí tự.')
         return False
     
     role = role.strip().lower()
     if role not in ['admin', 'organizer', 'student']:
+        print('Chọn sai vai trò.')
         return False
     
     new_user = {'username': username, 'password':password, 'role': role.lower()}
@@ -416,8 +420,14 @@ def main():
             
             elif choice == '2':
                 # TODO: TV5 hoặc TV6 sẽ xây dựng luồng đăng ký chi tiết ở đây
-                print("Chức năng đang được xây dựng.")
-                pass
+                print('----- Đăng kí tài khoản mới -----')
+                username = input('Tên đăng nhập: ')
+                password = input('Mật khẩu: ')
+                role = input('Nhập vai trò (Admin / Organizer /  Student): ')
+                if register(username, password, role):
+                    print('Tạo tài khoản thành công!')
+                else:
+                    print('tạo tài khoản thất bại. Kiểm tra lại thông tin.')
 
             elif choice == '0':
                 print("Cảm ơn đã sử dụng chương trình!")
