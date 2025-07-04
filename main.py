@@ -54,12 +54,7 @@ class Event:
 
 # --- Nhóm chức năng: Quản lý Người dùng (Dành cho TV3) ---
 
-#viêt hàm tính tổng:
-def tinh_tong_bang_de(a,b):
-    a = 0
-    b = 0
-    r = 0
-    return a + b + r
+
 
 def register(username: str, password: str, role: str) -> bool:
     users = load_data(USERS_FILE)
@@ -216,7 +211,7 @@ def export_to_csv():
 # PHẦN 4: CÁC HÀM GIAO DIỆN & HÀM CHÍNH (Nhóm UI/UX lấp đầy)
 # ==============================================================================
 
-# --- Nhóm hàm xử lý giao diện cho Admin (Dành cho TV5) ---
+# --- Nhóm hàm xử lý giao diện cho Admin (Dành cho TV5) ---3
 def dang_nhap():
     while True:
         print("=== MENU ===")
@@ -259,26 +254,24 @@ def handle_create_event():
     # 3. Gọi hàm backend: create_event(name, date, capacity)
     # 4. In ra thông báo thành công hoặc thất bại.
     
-    # 1. Lấy input từ người dùng
     name = input("Nhập tên sự kiện: ").strip()
     date = input("Nhập ngày tổ chức (YYYY-MM-DD): ").strip()
     capacity_str = input("Nhập sức chứa: ").strip()
 
-    # 2. Xác thực đầu vào
+
     try:
         capacity = int(capacity_str)
     except ValueError:
         print("Lỗi: Sức chứa phải là một số nguyên.")
         return
 
-    # 3. Gọi hàm backend
+
     try:
         event_id = create_event(name, date, capacity)  # Hàm này bạn đã định nghĩa ở phần backend
     except Exception as e:
         print(f"Tạo sự kiện thất bại: {e}")
         return
 
-    # 4. In ra thông báo thành công
     print(f"Tạo sự kiện thành công! (ID: {event_id})")
 
     pass
@@ -291,6 +284,44 @@ def handle_update_event():
     # 2. Lấy input: các thông tin mới (tên mới, sức chứa mới...).
     # 3. Gọi hàm backend: update_event(event_id, new_data)
     # 4. In ra thông báo.
+    print("\n--- CẬP NHẬT SỰ KIỆN ---")
+    event_id = input("Nhập ID sự kiện cần cập nhật: ").strip()
+    
+    # Nhập thông tin mới
+    new_name = input("Tên mới (để trống nếu không đổi): ").strip()
+    new_date = input("Ngày mới (YYYY-MM-DD) (để trống nếu không đổi): ").strip()
+    new_capacity = input("Sức chứa mới (để trống nếu không đổi): ").strip()
+
+    # Chuyển đổi sức chứa nếu có nhập
+    capacity = int(new_capacity) if new_capacity else None
+
+    # Gọi hàm backend update_event
+    success = update_event(event_id, name=new_name or None, date=new_date or None, capacity=capacity)
+
+    if success:
+        print("Cập nhật sự kiện thành công.")
+    else:
+        print("Không tìm thấy sự kiện hoặc cập nhật thất bại.")
+
+
+def handle_delete_event():
+    """(UI/UX - TV5) Xử lý luồng xóa sự kiện."""
+    print("\n--- XOÁ SỰ KIỆN ---")
+    event_id = input("Nhập ID sự kiện cần xóa: ").strip()
+
+    confirm = input("Bạn có chắc không ? (y/n): ").strip().lower()
+    if confirm != 'y':
+        print("Đã hủy thao tác xóa.")
+        return
+
+    # Gọi hàm backend delete_event
+    success = delete_event(event_id)
+
+    if success:
+        print(" Đã xóa sự kiện thành công.")
+    else:
+        print("Không tìm thấy sự kiện hoặc xóa thất bại.")
+
     pass
 
 # --- Nhóm hàm xử lý giao diện cho Admin & các vai trò khác (Dành cho TV6) ---
