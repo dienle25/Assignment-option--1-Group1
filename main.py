@@ -378,56 +378,14 @@ def show_student_menu(current_user):
     # (Tìm kiếm, Đăng ký, Xem sự kiện đã đăng ký)
     print(f"\n--- Menu Sinh viên (Chào mừng, {current_user.username}) ---")
     print("Chức năng đang được xây dựng.")
-def show_organizer_menu(current_user):
-    while True:
-        print("\n====== EVENT ORGANIZER MENU ======")
-        print("1. Tạo sự kiện mới")
-        print("2. Xem các sự kiện đã tạo")
-        print("3. Xem người tham dự cho 1 sự kiện")
-        print("4. Đăng xuất")
-
-        choice = input("Chọn một chức năng (1-4): ").strip()
-
-        if choice == "1":
-            handle_create_event(current_user)
-
-        elif choice == "2":
-            events = show_admin_menu(current_user['id'])
-            if not events:
-                print(" Bạn chưa tạo sự kiện nào.")
-            else:
-                print("\n Danh sách sự kiện đã tạo:")
-                for e in events:
-                    print(f"- ID: {e['id']}, Tên: {e['name']}, Ngày: {e['date']}, Sức chứa: {e['capacity']}")
-
-        elif choice == "3":
-            events =show_admin_menu(current_user['id'])
-            if not events:
-                print(" Bạn chưa tạo sự kiện nào.")
-                continue
-            
-            print("\n Danh sách sự kiện đã tạo:")
-            for e in events:
-                print(f"- ID: {e['id']}, Tên: {e['name']}")
-
-            event_id = input("Nhập ID sự kiện để xem người tham dự: ").strip()
-            attendees = view_attendees_for_event(event_id)
-            if not attendees:
-                print(" Không có người tham dự hoặc ID không hợp lệ.")
-            else:
-                print(f"\n Danh sách người tham dự (Tổng: {len(attendees)}):")
-                for idx, user in enumerate(attendees, 1):
-                    print(f"{idx}. {user['full_name']} (Username: {user['username']})")
-
-        elif choice == "4":
-            print(" Đăng xuất thành công.")
-            break
-
-        else:
-            print(" Lựa chọn không hợp lệ. Vui lòng chọn lại.")
-
     pass
 
+def show_organizer_menu(current_user):
+    """(UI/UX - TV5) Hiển thị và điều hướng menu cho Event Organizer."""
+    # TODO: TV5 sẽ xây dựng menu cho các chức năng của Event Organizer
+    print(f"\n--- Menu Nhà tổ chức (Chào mừng, {current_user.username}) ---")
+    print("Chức năng đang được xây dựng.")
+    pass
 
 # --- Hàm chạy chính của chương trình ---
 
