@@ -74,6 +74,7 @@ def register(username: str, password: str, role: str) -> bool:
         return False
     
     new_user = {'username': username, 'password':password, 'role': role.lower()}
+    users.append(new_user)
     save_data(USERS_FILE, users)
     return True
 
