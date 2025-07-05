@@ -1,5 +1,4 @@
 # main.py - PHIÊN BẢN TẤT CẢ TRONG MỘT
-
 import json
 import os
 import uuid
@@ -22,9 +21,7 @@ def load_data(file_path):
         with open(file_path, 'w', encoding='utf-8') as f:
             json.dump([], f)
         return []
-print("Tong 2 so:")
-def tong():
-    return
+
 def save_data(file_path, data):
     with open(file_path, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
@@ -58,22 +55,27 @@ class Event:
 
 def register(username: str, password: str, role: str) -> bool:
     users = load_data(USERS_FILE)
-    
+
     if username.strip() =='':
+        print('Tên đăng nhập không được để trống.')
         return False
     
     for user in users:
         if user['username'] == username:
+            print('Tên đăng nhập đã được đăng kí từ trước.')
             return False
         
     if len(password) < 6:
+        print('Mật khẩu không được ít hơn 6 kí tự.')
         return False
     
     role = role.strip().lower()
     if role not in ['admin', 'organizer', 'student']:
+        print('Chọn sai vai trò.')
         return False
     
     new_user = {'username': username, 'password':password, 'role': role.lower()}
+    users.append(new_user)
     save_data(USERS_FILE, users)
     return True
 
@@ -87,9 +89,15 @@ def login(username: str, password: str) -> User | None:
 
 # --- Nhóm chức năng: Quản lý Sự kiện của ADMIN (Dành cho TV4) ---
 
-def create_event(name: str, date: str, capacity: int) -> Event | None:
+def create_event(name: str, date: str, capacity: int, event_id: str = None) -> Event | None:
     events = load_data(EVENTS_FILE)
-    new_event = Event(name=name, date=date, capacity=capacity)
+    if event_id:
+        for e in events:
+            if e['event_id'] == event_id:
+                print("⚠️ ID sự kiện đã tồn tại. Vui lòng dùng ID khác.")
+                return None
+
+    new_event = Event(name=name, date=date, capacity=capacity, event_id=event_id)
     events.append(new_event.to_dict())
     save_data(EVENTS_FILE, events)
     return new_event
@@ -162,7 +170,22 @@ def register_for_event(username: str, event_id: str) -> tuple[bool, str]:
     - Trả về: Một tuple (bool, str) chứa trạng thái và tin nhắn. Ví dụ: (True, "Đăng ký thành công!"), (False, "Sự kiện đã đầy.").
     """
     # TODO: TV3 sẽ viết code logic vào đây, có thể cần sự hỗ trợ của TV2.
-    pass
+    events  = load_data(EVENTS_FILE)
+
+    #Kiểm tra sự kiện có tồn tại không
+    for event in events:
+        if event['event_id'] == event_id:
+            #kiểm tra sự kiện còn chỗ không: so sánh số lượng ng đki và sức chứa tối đa
+            if len(event['attendees']) == event['capacity']:
+                return False, 'Sự kiện đã đầy.'
+            #ktra ng dùng đã đki sự kiện này trước đó chưa:
+            if username in event['attendees']:
+                return False, 'Bạn đã đăng kí sự kiện này rồi.'
+            #nếu chưa có thì thêm nào ds attendees và lưu lại
+            event['attendees'].append(username)
+            save_data(EVENTS_FILE, events)
+            return True, "Đăng kí thành công!"
+    return False, 'Không tìm thấy sự kiện.'
 
 def view_registered_events(username: str) -> list[Event]:
     """
@@ -172,7 +195,15 @@ def view_registered_events(username: str) -> list[Event]:
     - Trả về: Một danh sách các đối tượng Event.
     """
     # TODO: TV3 sẽ viết code logic vào đây.
-    return []
+    events_data = load_data(EVENTS_FILE)
+    user_events = list()
+
+    for item in events_data:
+        if username in item['attendees']: #kiểm tra username có trong attendees hay không
+            #nếu có, tạo đối tượng Event (trong class Event) và gán vào biến e
+            e = Event(name=item['name'], date=item['date'], capacity=item['capacity'], event_id=item['event_id'], attendees=item['attendees'])
+            user_events.append(e)
+    return user_events
 
 # --- Nhóm chức năng: Chức năng của EVENT ORGANIZER (Dành cho TV4) ---
 
@@ -183,8 +214,10 @@ def view_attendees_for_event(event_id: str) -> list[str] | None:
     - Trả về: Một danh sách các username, hoặc None nếu không tìm thấy sự kiện.
     """
     # TODO: TV4 sẽ viết code logic vào đây.
-    pass
-
+    events = load_data(EVENTS_FILE)
+    for event in events:
+        if event.event_id == event_id:
+            return event.attendees
 # --- Nhóm chức năng: Báo cáo & Thống kê (Dành cho TV2) ---
 
 def calculate_total_attendees() -> int:
@@ -210,6 +243,7 @@ def export_to_csv():
 # # ==============================================================================
 # PHẦN 4: CÁC HÀM GIAO DIỆN & HÀM CHÍNH (Nhóm UI/UX lấp đầy)
 # ==============================================================================
+
 
 # --- Nhóm hàm xử lý giao diện cho Admin (Dành cho TV5) ---3
 def dang_nhap():
@@ -259,11 +293,29 @@ def handle_create_event():
     capacity_str = input("Nhập sức chứa: ").strip()
 
 
+
+# --- Nhóm hàm xử lý giao diện cho Admin (Dành cho TV5) ---
+def handle_create_event():
+    """(UI/UX - TV5) Xử lý luồng tạo sự kiện mới."""
+    print("\n--- Tạo sự kiện mới ---")
+    name = input("Nhập tên sự kiện: ")
+    date = input("Nhập ngày tổ chức (NĂM-THÁNG-NGÀY): ")
+
+
     try:
-        capacity = int(capacity_str)
+        capacity = int(input("Nhập sức chứa tối đa: "))
+        if capacity <= 0:
+            print("⚠️ Sức chứa phải lớn hơn 0.")
+            return
     except ValueError:
-        print("Lỗi: Sức chứa phải là một số nguyên.")
+        print(" Sức chứa phải là số nguyên.")
         return
+    use_custom_id = input("Bạn có muốn tự nhập ID sự kiện? (y/n): ").strip().lower()
+    if use_custom_id == 'y':
+        event_id = input("Nhập ID sự kiện (phải là duy nhất): ").strip()
+    else:
+        event_id = None
+
 
 
     try:
@@ -322,7 +374,46 @@ def handle_delete_event():
     else:
         print("Không tìm thấy sự kiện hoặc xóa thất bại.")
 
-    pass
+
+
+    new_event = create_event(name, date, capacity, event_id)
+    print(f" Sự kiện '{new_event.name}' đã được tạo thành công!")
+    print(f"Ngày: {new_event.date}")
+    print(f"🆔 ID: {new_event.event_id}")
+    print(f"👥 Sức chứa: {new_event.capacity}")
+
+def handle_update_event():
+    print("\n--- Cập nhật sự kiện ---")
+    event_id = input("Nhập ID sự kiện cần cập nhật: ") 
+    new_name = input("Nhập tên mới (để trống nếu không thay đổi): ")
+    new_date = input("Nhập ngày mới (NĂM-THÁNG-NGÀY, để trống nếu không thay đổi): ")
+
+    new_data = {}
+    if new_name.strip() != "":
+        new_data["name"] = new_name
+    if new_date.strip() != "":
+        new_data["date"] = new_date
+    try:
+        new_capacity = input("Nhập sức chứa mới (để trống nếu không thay đổi): ")
+        if new_capacity.strip() != "":
+            new_capacity = int(new_capacity)
+            if new_capacity <= 0:
+                print("⚠️ Sức chứa phải lớn hơn 0.")
+                return
+            new_data["capacity"] = new_capacity
+    except ValueError:
+        print("⚠️ Sức chứa phải là số nguyên.")
+        return
+
+    if not new_data:
+        print("⚠️ Bạn chưa nhập gì để cập nhật.")
+        return
+
+    if update_event(event_id, new_data):
+        print("✅ Đã cập nhật sự kiện.")
+    else:
+        print("❌ Không tìm thấy sự kiện để cập nhật.")
+
 
 # --- Nhóm hàm xử lý giao diện cho Admin & các vai trò khác (Dành cho TV6) ---
 
@@ -333,8 +424,22 @@ def handle_view_all_events():
     # 1. Gọi hàm backend: all_events = view_all_events()
     # 2. Dùng vòng lặp for để duyệt qua danh sách all_events.
     # 3. In thông tin mỗi sự kiện ra màn hình theo một định dạng đẹp mắt.
-    pass
+    events = view_all_events()
+    if not events:
+        print("Hiện tại không có sự kiện nào.")
+        return
+    for event in events:
+        print(f"ID: {event.event_id}, Tên: {event.name}, Ngày: {event.date}, Sức chứa: {event.capacity}, Người tham dự: {', '.join(event.attendees)}")
 
+def handle_search_event():
+    """(UI/UX - TV6) Xử lý luồng tìm kiếm sự kiện theo ID."""
+    print("\n--- Tìm kiếm sự kiện theo ID ---")
+    event_id = input("Nhập ID sự kiện cần tìm: ")
+    for event in view_all_events():
+        if event.event_id == event_id:
+            print(f"ID: {event.event_id}, Tên: {event.name}, Ngày: {event.date}, Sức chứa: {event.capacity}, Người tham dự: {', '.join(event.attendees)}")
+            return
+    print("Không tìm thấy sự kiện với ID này.")
 def handle_delete_event():
     """(UI/UX - TV6) Xử lý luồng xóa sự kiện."""
     # TODO: TV6 viết code để:
@@ -342,7 +447,14 @@ def handle_delete_event():
     # 2. In ra một câu hỏi xác nhận (Bạn có chắc không?).
     # 3. Nếu người dùng xác nhận, gọi hàm backend: delete_event(event_id)
     # 4. In ra thông báo.
-    pass
+    print("\n--- Xóa sự kiện ---")
+    event_id = input("Nhập ID sự kiện cần xóa: ")
+    confirm = input("Bạn có chắc chắn muốn xóa sự kiện này không? (y/n): ")
+    if confirm.lower() == 'y':
+        delete_event(event_id)
+        print(" Đã xóa sự kiện.")
+    else:
+        print("Hủy bỏ xóa sự kiện.")
 
 # --- Các hàm menu chính ---
 
@@ -354,6 +466,7 @@ def show_admin_menu(current_user):
         print("2. Xem tất cả sự kiện")
         print("3. Cập nhật sự kiện")
         print("4. Xóa sự kiện")
+        print("5. Tìm sự kiện theo ID")
         print("0. Đăng xuất")
         
         choice = input("Vui lòng nhập lựa chọn của bạn: ")
@@ -366,6 +479,8 @@ def show_admin_menu(current_user):
             handle_update_event()
         elif choice == '4':
             handle_delete_event()
+        elif choice == '5':
+            handle_search_event()
         elif choice == '0':
             print("Đang đăng xuất...")
             break
@@ -461,8 +576,14 @@ def main():
             
             elif choice == '2':
                 # TODO: TV5 hoặc TV6 sẽ xây dựng luồng đăng ký chi tiết ở đây
-                print("Chức năng đang được xây dựng.")
-                pass
+                print('----- Đăng kí tài khoản mới -----')
+                username = input('Tên đăng nhập: ')
+                password = input('Mật khẩu: ')
+                role = input('Nhập vai trò (Admin / Organizer /  Student): ')
+                if register(username, password, role):
+                    print('Tạo tài khoản thành công!')
+                else:
+                    print('tạo tài khoản thất bại. Kiểm tra lại thông tin.')
 
             elif choice == '0':
                 print("Cảm ơn đã sử dụng chương trình!")
