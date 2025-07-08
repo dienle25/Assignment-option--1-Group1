@@ -12,5 +12,12 @@
         "date": "2025-08-01",
         "capacity": 80,
         "attendees": []
+    },
+    {
+        "event_id": "hackathon",
+        "name": "quynd2",
+        "date": "1555-12-1",
+        "capacity": 80,
+        "attendees": []
     }
 ]

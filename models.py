@@ -12,6 +12,13 @@ class Event:
         self.name = name
         self.date = date
         self.capacity = capacity
-        self.attendees = attendees if attendees is not None else []
+        self.attendees = attendees if attendees else []
+
     def to_dict(self):
-        return {"event_id": self.event_id, "name": self.name, "date": self.date, "capacity": self.capacity, "attendees": self.attendees}
+        return {
+            "event_id": self.event_id,
+            "name": self.name,
+            "date": self.date,
+            "capacity": self.capacity,
+            "attendees": self.attendees
+        }

@@ -2,6 +2,26 @@
     {
         "username": "admin",
         "password": "123",
-        "role": "Admin"
+        "role": "admin"
+    },
+    {
+        "username": "quynd",
+        "password": "123456",
+        "role": "admin"
+    },
+    {
+        "username": "quynd1",
+        "password": "123456",
+        "role": "admin"
+    },
+    {
+        "username": "quynd2",
+        "password": "123456",
+        "role": "organizer"
+    },
+    {
+        "username": "ducquy",
+        "password": "123456",
+        "role": "admin"
     }
 ]
