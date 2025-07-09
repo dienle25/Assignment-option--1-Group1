@@ -1,3 +1,6 @@
+import uuid
+
+
 class User:
     def __init__(self, username, password, role):
         self.username = username
@@ -7,12 +10,13 @@ class User:
         return {"username": self.username, "password": self.password, "role": self.role}
 
 class Event:
-    def __init__(self, name: str, date: str, capacity: int, event_id: str = None, attendees: list = None):
-        self.event_id = event_id if event_id else str(uuid.uuid4())
+    def __init__(self, name, date, capacity, event_id=None, attendees=None, created_by=None):
         self.name = name
         self.date = date
         self.capacity = capacity
-        self.attendees = attendees if attendees else []
+        self.event_id = event_id or str(uuid.uuid4())  # Tạo ID ngẫu nhiên nếu không có
+        self.attendees = attendees or []
+        self.created_by = created_by  # Thêm dòng này
 
     def to_dict(self):
         return {
@@ -20,5 +24,7 @@ class Event:
             "name": self.name,
             "date": self.date,
             "capacity": self.capacity,
-            "attendees": self.attendees
+            "event_id": self.event_id,
+            "attendees": self.attendees,
+            "created_by": self.created_by  # Thêm dòng này
         }

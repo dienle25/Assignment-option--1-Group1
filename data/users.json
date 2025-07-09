@@ -2,26 +2,34 @@
     {
         "username": "admin",
         "password": "123",
-        "role": "admin"
+        "role": "Admin"
     },
     {
-        "username": "quynd",
+        "username": "lam",
         "password": "123456",
         "role": "admin"
     },
     {
-        "username": "quynd1",
+        "username": "quy",
         "password": "123456",
-        "role": "admin"
+        "role": "organizer",
+        "assigned_events": [
+            "ka"
+        ]
     },
     {
-        "username": "quynd2",
+        "username": "jack",
         "password": "123456",
-        "role": "organizer"
+        "role": "student"
     },
     {
-        "username": "ducquy",
+        "username": "ngudi",
         "password": "123456",
-        "role": "admin"
+        "role": "student"
+    },
+    {
+        "username": "5cu",
+        "password": "123456",
+        "role": "student"
     }
 ]

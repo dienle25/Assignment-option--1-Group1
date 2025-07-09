@@ -1,23 +1,21 @@
 [
     {
-        "event_id": "5fc06f2f-1d66-421c-9ab0-0295f2c15020",
-        "name": "Hội thảo AI",
-        "date": "2025-07-15",
-        "capacity": 100,
-        "attendees": []
+        "event_id": "nah",
+        "name": "hackathon",
+        "date": "0987-8-9",
+        "capacity": 2,
+        "attendees": [
+            "jack",
+            "ngudi"
+        ],
+        "created_by": "lam"
     },
     {
-        "event_id": "c6c72a4d-b37a-403b-bd21-a3fbfb62133f",
-        "name": "Hackathon Python",
-        "date": "2025-08-01",
-        "capacity": 80,
-        "attendees": []
-    },
-    {
-        "event_id": "hackathon",
-        "name": "quynd2",
-        "date": "1555-12-1",
-        "capacity": 80,
-        "attendees": []
+        "event_id": "ka",
+        "name": "hackfcup",
+        "date": "2222-1-22",
+        "capacity": 3,
+        "attendees": [],
+        "created_by": "lam"
     }
 ]

@@ -40,7 +40,7 @@ def login(username: str, password: str) -> User | None:
 
 # --- Nhóm chức năng: Quản lý Sự kiện của ADMIN (Dành cho TV4) ---
 
-def create_event(name: str, date: str, capacity: int, event_id: str = None) -> Event | None:
+def create_event(name: str, date: str, capacity: int, event_id: str = None, created_by: str = "") -> Event | None:
     events = load_data(EVENTS_FILE)
     if event_id:
         for e in events:
@@ -48,8 +48,12 @@ def create_event(name: str, date: str, capacity: int, event_id: str = None) -> E
                 print("⚠️ ID sự kiện đã tồn tại.")
                 return None
 
-    new_event = Event(name=name, date=date, capacity=capacity, event_id=event_id)
-    events.append(new_event.to_dict())
+    new_event = Event(name=name, date=date, capacity=capacity, event_id=event_id, created_by=created_by)
+    event_dict = new_event.to_dict()
+    event_dict['created_by'] = created_by  # Thêm người tạo
+
+    event_dict['attendees'] = []
+    events.append(event_dict)
     save_data(EVENTS_FILE, events)
     return new_event
 
@@ -99,20 +103,40 @@ def view_all_events() -> list[Event]:
     events_data = load_data(EVENTS_FILE)
     return [Event(**event_dict) for event_dict in events_data]
 
+def assign_event_to_organizer(username: str, event_id: str) -> bool:
+    users = load_data(USERS_FILE)
+    for user in users:
+        if user['username'] == username and user['role'] == 'organizer':
+            if 'assigned_events' not in user:
+                user['assigned_events'] = []
+            if event_id not in user['assigned_events']:
+                user['assigned_events'].append(event_id)
+                save_data(USERS_FILE, users)
+                print(f"✅ Đã gán sự kiện '{event_id}' cho organizer '{username}'")
+                return True
+            else:
+                print("⚠️ Organizer đã được gán sự kiện này rồi.")
+                return False
+    print("❌ Không tìm thấy organizer.")
+    return False
+
 # --- Nhóm chức năng: Chức năng của STUDENT (Dành cho TV3) ---
 def search_events(keyword: str) -> list[Event]:
     keyword = keyword.lower()
     events_data = load_data(EVENTS_FILE)
-    matching_events = list()
+    matching_events = []
 
-    for item in events_data: 
-        if (keyword in item['name'].lower()   
-            or keyword in item['date']
-            or keyword in item['capacity']
-            or keyword in item['event_id'].lower()
-            or keyword in str(item['attendees'].lower())):
-            #tạo đối tượng Event (trong class Event) và gán vào biến e
-            e = Event(name = item['name'], date = item['date'], capacity = item['capacity'], event_id = item['event_id'], attendees = item['attendees'])
+    for item in events_data:
+        name = item.get('name', '').lower()
+        if keyword in name:  # 🔍 So khớp theo tên
+            e = Event(
+                name=item['name'],
+                date=item['date'],
+                capacity=item['capacity'],
+                event_id=item['event_id'],
+                attendees=item.get('attendees', []),
+                created_by=item.get('created_by', 'N/A')
+            )
             matching_events.append(e)
     return matching_events
 
@@ -121,14 +145,20 @@ def register_for_event(username: str, event_id: str) -> tuple[bool, str]:
 
     for event in events:
         if event['event_id'] == event_id:
-            if len(event['attendees']) >= event['capacity']:
-                return False, "Sự kiện đã đầy."
+            if 'attendees' not in event:
+                event['attendees'] = []
+
             if username in event['attendees']:
-                return False, "Bạn đã đăng ký sự kiện này rồi."
+                return False, "duplicated"  # đã đăng ký rồi
+
+            if len(event['attendees']) >= event['capacity']:
+                return False, "full"  # sự kiện đã đầy
+
             event['attendees'].append(username)
             save_data(EVENTS_FILE, events)
-            return True, "Đăng ký thành công!"
-    return False, "Không tìm thấy sự kiện."
+            return True, "success"  # đăng ký thành công
+
+    return False, "not_found"
 
 def view_registered_events(username: str) -> list[Event]:
     events_data = load_data(EVENTS_FILE)
@@ -140,7 +170,8 @@ def view_registered_events(username: str) -> list[Event]:
                 date=item['date'],
                 capacity=item['capacity'],
                 event_id=item['event_id'],
-                attendees=item['attendees']
+                attendees=item['attendees'],
+                created_by=item.get('created_by', 'N/A')
             )
             user_events.append(e)
     return user_events
@@ -169,18 +200,54 @@ def view_attendees_for_event(event_id: str) -> list[str] | None:
 
 def calculate_total_attendees() -> int:
     """(Backend - TV2) Tính tổng số lượt đăng ký trên tất cả các sự kiện."""
-    # TODO: TV2 sẽ viết code logic vào đây.
-    pass
+    events = load_data(EVENTS_FILE)
+    total = 0
+    for event in events:
+        attendees = event.get("attendees", [])
+        total += len(attendees)
+    return total
 
 def find_events_by_attendance() -> dict:
     """
     (Backend - TV2) Tìm sự kiện có số người tham dự cao nhất và thấp nhất.
-    - Trả về: Một dictionary, ví dụ: {"highest": {"name": "Tên event", "count": 100}, "lowest": ...}
+    - Trả về: Một dictionary, ví dụ: 
+    {"highest": {"name": ..., "count": ...}, "lowest": {"name": ..., "count": ...}}
     """
-    # TODO: TV2 sẽ viết code logic vào đây.
-    pass
+    events = load_data(EVENTS_FILE)
+    if not events:
+        return {"highest": None, "lowest": None}
+    
+    highest = {"name": None, "count": -1}
+    lowest = {"name": None, "count": float('inf')}
+
+    for event in events:
+        name = event.get("name", "Unknown")
+        count = len(event.get("attendees", []))
+
+        if count > highest["count"]:
+            highest = {"name": name, "count": count}
+        if count < lowest["count"]:
+            lowest = {"name": name, "count": count}
+
+    return {"highest": highest, "lowest": lowest}
 
 def export_to_csv():
     """(Backend - TV2) Xuất báo cáo ra file CSV."""
-    # TODO: TV2 sẽ viết code logic vào đây.
-    pass
+    events = load_data(EVENTS_FILE)
+    filename = "events_report.csv"
+
+    with open(filename, mode="w", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+        writer.writerow(["Event ID", "Tên sự kiện", "Ngày", "Sức chứa", "Người tạo", "Số người tham dự"])
+
+        for event in events:
+            writer.writerow([
+                event.get("event_id", ""),
+                event.get("name", ""),
+                event.get("date", ""),
+                event.get("capacity", ""),
+                event.get("created_by", ""),
+                len(event.get("attendees", []))
+            ])
+
+    print(f"✅ Đã xuất dữ liệu ra file: {filename}")
