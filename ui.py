@@ -30,6 +30,8 @@ def handle_create_event(current_user):
 
     new_event = create_event(name, date, capacity, event_id, created_by=current_user.username)
 
+    organizer_username = ""
+
     if current_user.role == 'admin' and new_event:
         organizer_username = input("Bạn có muốn gán sự kiện này cho organizer nào không? (nhập username hoặc Enter để bỏ qua): ").strip()
     if organizer_username:
