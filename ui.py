@@ -7,11 +7,21 @@ from file_handler import load_data, save_data, USERS_FILE
 from services import create_event, update_event, view_all_events, search_events, register_for_event, view_registered_events, calculate_total_attendees,find_events_by_attendance,export_to_csv, get_events_by_organizer
 # --- Nhóm hàm xử lý giao diện ---
 
+from datetime import datetime
+
 def handle_create_event(current_user):
     """Xử lý luồng tạo sự kiện mới, có ghi nhận người tạo."""
     print("\n--- Tạo sự kiện mới ---")
     name = input("Nhập tên sự kiện: ")
-    date = input("Nhập ngày tổ chức (NĂM-THÁNG-NGÀY): ")
+
+    # ✅ Kiểm tra định dạng ngày
+    while True:
+        date = input("Nhập ngày tổ chức (NĂM-THÁNG-NGÀY): ").strip()
+        try:
+            datetime.strptime(date, "%Y-%m-%d")
+            break
+        except ValueError:
+            print("⚠️ Nhập không đúng định dạng. Vui lòng nhập theo dạng NĂM-THÁNG-NGÀY (VD: 2025-07-10).")
 
     try:
         capacity = int(input("Nhập sức chứa tối đa: "))
