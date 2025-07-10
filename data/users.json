@@ -2,7 +2,7 @@
     {
         "username": "admin",
         "password": "123",
-        "role": "Admin"
+        "role": "admin"
     },
     {
         "username": "lam",
@@ -29,6 +29,26 @@
     },
     {
         "username": "5cu",
+        "password": "123456",
+        "role": "student"
+    },
+    {
+        "username": "Tũn",
+        "password": "567890",
+        "role": "admin"
+    },
+    {
+        "username": "abcd",
+        "password": "123456",
+        "role": "organizer",
+        "assigned_events": [
+            "ka",
+            "abc",
+            "nah"
+        ]
+    },
+    {
+        "username": "khanh",
         "password": "123456",
         "role": "student"
     }

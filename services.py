@@ -118,7 +118,6 @@ def assign_event_to_organizer(username: str, event_id: str) -> bool:
             if event_id not in user['assigned_events']:
                 user['assigned_events'].append(event_id)
                 save_data(USERS_FILE, users)
-                print(f"✅ Đã gán sự kiện '{event_id}' cho organizer '{username}'")
                 return True
             else:
                 print("⚠️ Organizer đã được gán sự kiện này rồi.")

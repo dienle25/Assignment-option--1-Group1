@@ -22,7 +22,12 @@ def handle_create_event(current_user):
         print("⚠️ Sức chứa phải là số nguyên.")
         return
 
-    use_custom_id = input("Bạn có muốn tự nhập ID sự kiện? (y/n): ").strip().lower()
+    while True:
+        use_custom_id = input("Bạn có muốn tự nhập ID sự kiện? (y/n): ").strip().lower()
+        if use_custom_id in ['y', 'n', 'yes', 'no']:
+            break
+        print("⚠️ Vui lòng chỉ nhập 'y' hoặc 'n'.")
+
     if use_custom_id == 'y':
         event_id = input("Nhập ID sự kiện (phải là duy nhất): ").strip()
     else:
@@ -91,6 +96,7 @@ def handle_update_event():
         new_data["name"] = new_name
     if new_date.strip() != "":
         new_data["date"] = new_date
+
     try:
         new_capacity = input("Nhập sức chứa mới (để trống nếu không thay đổi): ")
         if new_capacity.strip() != "":
@@ -103,12 +109,33 @@ def handle_update_event():
         print("⚠️ Sức chứa phải là số nguyên.")
         return
 
-    if not new_data:
+    # ✅ Hỏi phân quyền ngay sau phần sức chứa
+    while True:
+        assign_organizer = input("Bạn có muốn gán organizer cho sự kiện này? (y/n): ").strip().lower()
+        if assign_organizer in ['y', 'n', 'yes', 'no']:
+            break
+        print("⚠️ Vui lòng chỉ nhập 'y' hoặc 'n'.")
+
+    organizer_username = ""
+    if assign_organizer == 'y':
+        organizer_username = input("Nhập username của organizer: ").strip()
+
+    # ✅ Nếu không có gì để cập nhật thì dừng
+    if not new_data and not organizer_username:
         print("⚠️ Bạn chưa nhập gì để cập nhật.")
         return
 
-    if update_event(event_id, new_data):
-        print("✅ Đã cập nhật sự kiện.")
+    # ✅ Tiến hành cập nhật sự kiện
+    success = update_event(event_id, new_data)
+    if success:
+        print("✅ Đã cập nhật thông tin sự kiện.")
+        
+        if organizer_username:
+            assigned = services.assign_event_to_organizer(organizer_username, event_id)
+            if assigned:
+                print(f"✅ Đã gán sự kiện cho organizer '{organizer_username}'.")
+            else:
+                print("⚠️ Không thể gán organizer. Kiểm tra lại tên người dùng và vai trò.")
     else:
         print("❌ Không tìm thấy sự kiện để cập nhật.")
 
