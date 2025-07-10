@@ -33,6 +33,9 @@ def register(username: str, password: str, role: str) -> bool:
 def login(username: str, password: str) -> User | None:
     users = load_data(USERS_FILE)
 
+    for user in users:
+        user['role'] = user['role'].strip().lower()
+
     for user  in users:
         if user['username'] == username and user['password'] == password:
             return User(user['username'], user['password'], user['role'])
@@ -105,6 +108,9 @@ def view_all_events() -> list[Event]:
 
 def assign_event_to_organizer(username: str, event_id: str) -> bool:
     users = load_data(USERS_FILE)
+    for user in users:
+        user['role'] = user['role'].strip().lower()
+
     for user in users:
         if user['username'] == username and user['role'] == 'organizer':
             if 'assigned_events' not in user:
