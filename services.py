@@ -77,6 +77,17 @@ def update_event(event_id: str, new_data: dict) -> bool:
     updated = False
     for event in events:
         if event['event_id'] == event_id:
+
+            # ✅ Kiểm tra capacity nếu có
+            if 'capacity' in new_data:
+                new_capacity = new_data['capacity']
+                current_attendee_count = len(event.get('attendees', []))
+
+                if new_capacity < current_attendee_count:
+                    # ❌ Sai logic → trả False
+                    print(f"❌ Không thể giảm sức chứa xuống {new_capacity} vì đã có {current_attendee_count} người tham gia.")
+                    return False
+
             for key, value in new_data.items():
                 if key in event:
                     event[key] = value

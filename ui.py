@@ -147,7 +147,7 @@ def handle_update_event():
             else:
                 print("⚠️ Không thể gán organizer. Kiểm tra lại tên người dùng và vai trò.")
     else:
-        print("❌ Không tìm thấy sự kiện để cập nhật.")
+        print("❌ Cập nhật thất bại. Kiểm tra lại thông tin sự kiện.")
 
 
 def handle_view_all_events():
