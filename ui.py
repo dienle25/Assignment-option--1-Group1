@@ -169,13 +169,23 @@ def handle_view_all_events():
         print("-" * 40)
 
 
-def handle_delete_event():
+def handle_delete_event(current_user):
     print("\n--- Xóa sự kiện ---")
-    event_id = input("Nhập ID sự kiện cần xóa: ")
-    confirm = input("Bạn có chắc chắn muốn xóa sự kiện này không? (y/n): ")
-    if confirm.lower() == 'y':
-        services.delete_event(event_id)
-        print("✅ Đã xóa sự kiện.")
+    event_id = input("Nhập ID sự kiện cần xóa: ").strip()
+
+    # ✅ Kiểm tra chặt chẽ y/n
+    while True:
+        confirm = input("Bạn có chắc chắn muốn xóa sự kiện này không? (y/n): ").strip().lower()
+        if confirm in ['y', 'n', 'yes', 'no']:
+            break
+        print("⚠️ Vui lòng chỉ nhập 'y' (đồng ý) hoặc 'n' (hủy bỏ).")
+
+    if confirm == 'y' or confirm == 'yes':
+        success = services.delete_event(event_id, current_user)
+        if success:
+            print("✅ Sự kiện đã được xóa và dữ liệu đã được cập nhật.")
+        else:
+            print("❌ Xóa sự kiện thất bại.")
     else:
         print("❌ Hủy bỏ xóa sự kiện.")
 
@@ -232,7 +242,7 @@ def show_admin_menu(current_user):
         elif choice == '3':
             handle_update_event()
         elif choice == '4':
-            handle_delete_event()
+            handle_delete_event(current_user)
         elif choice == '5':
             handle_search_event()
         elif choice == '6':

@@ -45,6 +45,13 @@ def login(username: str, password: str) -> User | None:
 
 def create_event(name: str, date: str, capacity: int, event_id: str = None, created_by: str = "") -> Event | None:
     events = load_data(EVENTS_FILE)
+
+        # ✅ CHẶN trùng tên và ngày
+    for event in events:
+        if event['name'].strip().lower() == name.strip().lower() and event['date'] == date:
+            print("⚠️ Đã tồn tại một sự kiện có cùng tên và ngày. Không thể tạo trùng.")
+            return None
+
     if event_id:
         for e in events:
             if e['event_id'] == event_id:
@@ -79,21 +86,40 @@ def update_event(event_id: str, new_data: dict) -> bool:
     save_data(EVENTS_FILE, events)
     return updated
 
-def delete_event(event_id: str) -> bool:
+def delete_event(event_id: str, current_user: User) -> bool:
     """
     (Backend - TV4) Xóa một sự kiện.
     - Logic: Tìm và xóa sự kiện khỏi danh sách trong events.json.
     - Trả về: True nếu xóa thành công, False nếu không tìm thấy ID.
     """
+    events = load_data(EVENTS_FILE)
+    users = load_data(USERS_FILE)
     deleted = False
-    events = load_data(EVENTS_FILE)  # Tải dữ liệu từ file JSON
+
     for i, event in enumerate(events):
         if event.get('event_id') == event_id:
-            del events[i]  # Xóa sự kiện tại vị trí i
+            if current_user.role != "admin" and event.get("created_by") != current_user.username:
+                print("❌ Bạn không có quyền xóa sự kiện này.")
+                return False
+            del events[i]
             deleted = True
             break
-    save_data(EVENTS_FILE, events)  # Ghi lại dữ liệu mới vào file
-    return deleted
+
+    if not deleted:
+        print("❌ Không tìm thấy sự kiện để xóa.")
+        return False
+
+    # ✅ Loại bỏ khỏi assigned_events nếu có
+    for user in users:
+        if user.get('role', '').strip().lower() == 'organizer':
+            if 'assigned_events' in user and event_id in user['assigned_events']:
+                user['assigned_events'].remove(event_id)
+
+    save_data(EVENTS_FILE, events)
+    save_data(USERS_FILE, users)
+
+    print(f"✅ Đã xóa sự kiện '{event_id}' và cập nhật lại danh sách organizer.")
+    return True
 
 def view_attendees_for_event(event_id: str) -> list[str] | None:
     events = load_data(EVENTS_FILE)

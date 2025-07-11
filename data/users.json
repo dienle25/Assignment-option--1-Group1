@@ -13,9 +13,7 @@
         "username": "quy",
         "password": "123456",
         "role": "organizer",
-        "assigned_events": [
-            "ka"
-        ]
+        "assigned_events": []
     },
     {
         "username": "jack",
@@ -42,7 +40,6 @@
         "password": "123456",
         "role": "organizer",
         "assigned_events": [
-            "ka",
             "abc",
             "nah"
         ]
