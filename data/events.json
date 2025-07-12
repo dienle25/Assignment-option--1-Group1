@@ -41,5 +41,21 @@
         "capacity": 100,
         "attendees": [],
         "created_by": "admin"
+    },
+    {
+        "event_id": "ev0001",
+        "name": "event1",
+        "date": "2025-12-12",
+        "capacity": 200,
+        "attendees": [],
+        "created_by": "admin"
+    },
+    {
+        "event_id": "ev0002",
+        "name": "event2",
+        "date": "2025-10-7",
+        "capacity": 300,
+        "attendees": [],
+        "created_by": "admin"
     }
 ]

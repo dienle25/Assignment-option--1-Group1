@@ -1,4 +1,4 @@
-import uuid
+
 
 
 class User:
@@ -14,7 +14,7 @@ class Event:
         self.name = name
         self.date = date
         self.capacity = capacity
-        self.event_id = event_id or str(uuid.uuid4())  # Tạo ID ngẫu nhiên nếu không có
+        self.event_id = event_id  #nhận id ngẫu nhiên từ file services
         self.attendees = attendees or []
         self.created_by = created_by  # Thêm dòng này
 

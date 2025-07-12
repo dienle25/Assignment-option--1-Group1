@@ -46,13 +46,23 @@ def login(username: str, password: str) -> User | None:
 def create_event(name: str, date: str, capacity: int, event_id: str = None, created_by: str = "") -> Event | None:
     events = load_data(EVENTS_FILE)
 
-        # ✅ CHẶN trùng tên và ngày
+    # ✅ CHẶN trùng tên và ngày
     for event in events:
         if event['name'].strip().lower() == name.strip().lower() and event['date'] == date:
             print("⚠️ Đã tồn tại một sự kiện có cùng tên và ngày. Không thể tạo trùng.")
             return None
 
-    if event_id:
+    # ✅ Nếu không nhập ID → tự động tạo ID kiểu ev0001
+    if not event_id:
+        existing_ids = [e.get("event_id", "") for e in events if e.get("event_id", "").startswith("ev")]
+        next_num = 1
+        while True:
+            new_id = f"ev{next_num:04d}"
+            if new_id not in existing_ids:
+                event_id = new_id
+                break
+            next_num += 1
+    else:
         for e in events:
             if e['event_id'] == event_id:
                 print("⚠️ ID sự kiện đã tồn tại.")
