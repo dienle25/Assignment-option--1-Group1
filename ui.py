@@ -34,9 +34,9 @@ def handle_create_event(current_user):
 
     while True:
         use_custom_id = input("Bạn có muốn tự nhập ID sự kiện? (y/n): ").strip().lower()
-        if use_custom_id in ['y', 'n', 'yes', 'no']:
+        if use_custom_id in ['y', 'n']:
             break
-        print("⚠️ Vui lòng chỉ nhập 'y' hoặc 'n'.")
+        print("⚠️ Vui lòng chỉ nhập 'y' (đồng ý) hoặc 'n' (không).")
 
     if use_custom_id == 'y':
         event_id = input("Nhập ID sự kiện (phải là duy nhất): ").strip()
@@ -105,7 +105,12 @@ def handle_update_event():
     if new_name.strip() != "":
         new_data["name"] = new_name
     if new_date.strip() != "":
-        new_data["date"] = new_date
+        try:
+            datetime.strptime(new_date.strip(), "%Y-%m-%d")  # kiểm tra hợp lệ
+            new_data["date"] = new_date.strip()
+        except ValueError:
+            print("⚠️ Ngày không hợp lệ. Vui lòng nhập đúng định dạng YYYY-MM-DD.")
+            return
 
     try:
         new_capacity = input("Nhập sức chứa mới (để trống nếu không thay đổi): ")
@@ -122,9 +127,9 @@ def handle_update_event():
     # ✅ Hỏi phân quyền ngay sau phần sức chứa
     while True:
         assign_organizer = input("Bạn có muốn gán organizer cho sự kiện này? (y/n): ").strip().lower()
-        if assign_organizer in ['y', 'n', 'yes', 'no']:
+        if assign_organizer in ['y', 'n']:
             break
-        print("⚠️ Vui lòng chỉ nhập 'y' hoặc 'n'.")
+        print("⚠️ Vui lòng chỉ nhập 'y' (đồng ý) hoặc 'n' (không).")
 
     organizer_username = ""
     if assign_organizer == 'y':
@@ -176,9 +181,9 @@ def handle_delete_event(current_user):
     # ✅ Kiểm tra chặt chẽ y/n
     while True:
         confirm = input("Bạn có chắc chắn muốn xóa sự kiện này không? (y/n): ").strip().lower()
-        if confirm in ['y', 'n', 'yes', 'no']:
+        if confirm in ['y', 'n']:
             break
-        print("⚠️ Vui lòng chỉ nhập 'y' (đồng ý) hoặc 'n' (hủy bỏ).")
+        print("⚠️ Vui lòng chỉ nhập 'y' (đồng ý) hoặc 'n' (không).")
 
     if confirm == 'y' or confirm == 'yes':
         success = services.delete_event(event_id, current_user)
