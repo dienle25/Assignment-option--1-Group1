@@ -164,7 +164,7 @@ def handle_view_all_events():
     print("\n📋 Danh sách tất cả sự kiện:\n")
     for event in events:
         so_nguoi_tham_du = len(event.attendees) if event.attendees else 0
-        print(f"--- Sự kiện {event.event_id} ---")
+        print(f"--- Sự kiện {event.name} ---")
         print(f"ID: {event.event_id}")
         print(f"Tên: {event.name}")
         print(f"Ngày: {event.date}")
