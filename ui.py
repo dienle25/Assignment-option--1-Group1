@@ -97,62 +97,53 @@ def print_registered_events(username: str):
 
 def handle_update_event():
     print("\n--- Cập nhật sự kiện ---")
-    event_id = input("Nhập ID sự kiện cần cập nhật: ") 
-    new_name = input("Nhập tên mới (để trống nếu không thay đổi): ")
-    new_date = input("Nhập ngày mới (NĂM-THÁNG-NGÀY, để trống nếu không thay đổi): ")
+    event_id = input("Nhập ID sự kiện cần cập nhật: ").strip()
+
+    new_name = input("Nhập tên mới (để trống nếu không thay đổi): ").strip()
+    new_date = input("Nhập ngày mới (YYYY-MM-DD, để trống nếu không thay đổi): ").strip()
+    new_capacity = input("Nhập sức chứa mới (để trống nếu không thay đổi): ").strip()
 
     new_data = {}
-    if new_name.strip() != "":
+
+    # Kiểm tra tên mới
+    if new_name:
         new_data["name"] = new_name
-    if new_date.strip() != "":
+
+    # Kiểm tra ngày mới
+    if new_date:
         try:
-            datetime.strptime(new_date.strip(), "%Y-%m-%d")  # kiểm tra hợp lệ
-            new_data["date"] = new_date.strip()
+            date_obj = datetime.strptime(new_date, "%Y-%m-%d")
+            if date_obj.date() < datetime.now().date():
+                print("⚠️ Không thể đặt ngày trong quá khứ.")
+                return
+            new_data["date"] = new_date
         except ValueError:
             print("⚠️ Ngày không hợp lệ. Vui lòng nhập đúng định dạng YYYY-MM-DD.")
             return
 
-    try:
-        new_capacity = input("Nhập sức chứa mới (để trống nếu không thay đổi): ")
-        if new_capacity.strip() != "":
+    # Kiểm tra sức chứa mới
+    if new_capacity:
+        try:
             new_capacity = int(new_capacity)
             if new_capacity <= 0:
                 print("⚠️ Sức chứa phải lớn hơn 0.")
                 return
             new_data["capacity"] = new_capacity
-    except ValueError:
-        print("⚠️ Sức chứa phải là số nguyên.")
+        except ValueError:
+            print("⚠️ Sức chứa phải là số nguyên.")
+            return
+
+    if not new_data:
+        print("⚠️ Bạn chưa nhập thông tin mới để cập nhật.")
         return
 
-    # ✅ Hỏi phân quyền ngay sau phần sức chứa
-    while True:
-        assign_organizer = input("Bạn có muốn gán organizer cho sự kiện này? (y/n): ").strip().lower()
-        if assign_organizer in ['y', 'n']:
-            break
-        print("⚠️ Vui lòng chỉ nhập 'y' (đồng ý) hoặc 'n' (không).")
-
-    organizer_username = ""
-    if assign_organizer == 'y':
-        organizer_username = input("Nhập username của organizer: ").strip()
-
-    # ✅ Nếu không có gì để cập nhật thì dừng
-    if not new_data and not organizer_username:
-        print("⚠️ Bạn chưa nhập gì để cập nhật.")
-        return
-
-    # ✅ Tiến hành cập nhật sự kiện
+    # Gọi backend để cập nhật
     success = update_event(event_id, new_data)
+
     if success:
-        print("✅ Đã cập nhật thông tin sự kiện.")
-        
-        if organizer_username:
-            assigned = services.assign_event_to_organizer(organizer_username, event_id)
-            if assigned:
-                print(f"✅ Đã gán sự kiện cho organizer '{organizer_username}'.")
-            else:
-                print("⚠️ Không thể gán organizer. Kiểm tra lại tên người dùng và vai trò.")
+        print("✅ Cập nhật sự kiện thành công.")
     else:
-        print("❌ Cập nhật thất bại. Kiểm tra lại thông tin sự kiện.")
+        print("❌ Không tìm thấy sự kiện hoặc cập nhật thất bại.")
 
 
 def handle_view_all_events():

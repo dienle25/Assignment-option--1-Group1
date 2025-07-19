@@ -1,8 +1,10 @@
 # services.py
+import uuid
+import csv
+from datetime import datetime  # để xử lý ngày giờ
+
 from models import User, Event
 from file_handler import load_data, save_data, USERS_FILE, EVENTS_FILE
-import csv 
-import uuid
 # ... (code các hàm logic của bạn)
 def register(username: str, password: str, role: str) -> bool:
     users = load_data(USERS_FILE)
@@ -46,6 +48,16 @@ def login(username: str, password: str) -> User | None:
 def create_event(name: str, date: str, capacity: int, event_id: str = None, created_by: str = "") -> Event | None:
     events = load_data(EVENTS_FILE)
 
+    # ✅ CHẶN sự kiện trong quá khứ
+    try:
+        event_date = datetime.strptime(date, "%Y-%m-%d").date()
+        if event_date < datetime.now().date():
+            print("❌ Không thể tạo sự kiện trong quá khứ.")
+            return None
+    except ValueError:
+        print("❌ Ngày không hợp lệ. Vui lòng nhập đúng định dạng YYYY-MM-DD.")
+        return None
+
     # ✅ CHẶN trùng tên và ngày
     for event in events:
         if event['name'].strip().lower() == name.strip().lower() and event['date'] == date:
@@ -71,30 +83,34 @@ def create_event(name: str, date: str, capacity: int, event_id: str = None, crea
     new_event = Event(name=name, date=date, capacity=capacity, event_id=event_id, created_by=created_by)
     event_dict = new_event.to_dict()
     event_dict['created_by'] = created_by  # Thêm người tạo
-
     event_dict['attendees'] = []
+
     events.append(event_dict)
     save_data(EVENTS_FILE, events)
     return new_event
 
 def update_event(event_id: str, new_data: dict) -> bool:
-    """
-    (Backend - TV4) Cập nhật thông tin sự kiện.
-    - Logic: Tìm sự kiện theo ID, cập nhật các trường trong new_data, lưu lại.
-    - Trả về: True nếu cập nhật thành công, False nếu không tìm thấy ID.
-    """
     events = load_data(EVENTS_FILE)
     updated = False
     for event in events:
         if event['event_id'] == event_id:
 
-            # ✅ Kiểm tra capacity nếu có
+            # ✅ Kiểm tra ngày không nằm trong quá khứ
+            if 'date' in new_data:
+                try:
+                    new_date = datetime.strptime(new_data['date'], "%Y-%m-%d").date()
+                    if new_date < datetime.now().date():
+                        print("❌ Không thể cập nhật ngày trong quá khứ.")
+                        return False
+                except ValueError:
+                    print("❌ Ngày không hợp lệ.")
+                    return False
+
+            # ✅ Kiểm tra sức chứa
             if 'capacity' in new_data:
                 new_capacity = new_data['capacity']
                 current_attendee_count = len(event.get('attendees', []))
-
                 if new_capacity < current_attendee_count:
-                    # ❌ Sai logic → trả False
                     print(f"❌ Không thể giảm sức chứa xuống {new_capacity} vì đã có {current_attendee_count} người tham gia.")
                     return False
 
