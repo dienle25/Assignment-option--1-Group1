@@ -57,5 +57,13 @@
         "capacity": 300,
         "attendees": [],
         "created_by": "admin"
+    },
+    {
+        "event_id": "E1",
+        "name": "Event1",
+        "date": "2025-07-20",
+        "capacity": 10,
+        "attendees": [],
+        "created_by": "admin"
     }
 ]

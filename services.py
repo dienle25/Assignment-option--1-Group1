@@ -1,7 +1,9 @@
 # services.py
 import uuid
 import csv
+import os
 from datetime import datetime  # để xử lý ngày giờ
+
 
 from models import User, Event
 from file_handler import load_data, save_data, USERS_FILE, EVENTS_FILE
@@ -304,7 +306,8 @@ def export_to_csv():
     events = load_data(EVENTS_FILE)
     filename = "events_report.csv"
 
-    with open(filename, mode="w", newline="", encoding="utf-8") as file:
+    
+    with open(filename, mode="w", newline="", encoding="utf-8-sig") as file:
         writer = csv.writer(file)
         writer.writerow(["Event ID", "Tên sự kiện", "Ngày", "Sức chứa", "Người tạo", "Số người tham dự"])
 
