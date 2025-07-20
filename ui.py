@@ -3,8 +3,10 @@
 # Import các module cần thiết
 import services
 from models import User
-from file_handler import load_data, save_data, USERS_FILE
+from file_handler import load_data, save_data, USERS_FILE, EVENTS_FILE
+# Các hàm từ services.py
 from services import create_event, update_event, view_all_events, search_events, register_for_event, view_registered_events, calculate_total_attendees,find_events_by_attendance,export_to_csv, get_events_by_organizer
+from services import assign_event_to_organizer
 # --- Nhóm hàm xử lý giao diện ---
 
 from datetime import datetime
@@ -57,27 +59,44 @@ def handle_create_event(current_user):
         print(f"🆔 ID: {new_event.event_id}")
         print(f"👥 Sức chứa: {new_event.capacity}")
         print(f"👤 Tạo bởi: {new_event.created_by}")
-        print(f"👨‍👩‍👧‍👦 Số người đã đăng ký: {len(new_event.attendees)}")
+        print(f" Số người đã đăng ký: {len(new_event.attendees)}")
     else:
         print("❌ Không thể tạo sự kiện. Vui lòng kiểm tra lại thông tin đã nhập.")
 
 def handle_search_event():
-    """(UI/UX - TV6) Xử lý luồng tìm kiếm sự kiện theo ID."""
     print("\n--- Tìm kiếm sự kiện theo ID ---")
-    event_id = input("Nhập ID sự kiện cần tìm: ")
-    for event in view_all_events():
-        if event.event_id == event_id:
-            so_nguoi_tham_gia = len(event.attendees) if event.attendees else 0
-            print(f"\n🔍 Thông tin sự kiện tìm thấy:")
-            print(f"ID: {event.event_id}")
-            print(f"Tên: {event.name}")
-            print(f"Ngày: {event.date}")
-            print(f"Sức chứa: {event.capacity}")
-            print(f"Số người tham gia: {so_nguoi_tham_gia}")
-            print(f"Tạo bởi: {getattr(event, 'created_by', 'Không rõ')}")
-            print("-" * 40)
-            return
-    print("❌ Không tìm thấy sự kiện với ID này.")
+    event_id = input("Nhập ID sự kiện cần tìm: ").strip()
+
+    events = view_all_events()
+    matched_event = next((event for event in events if event.event_id == event_id), None)
+
+    if matched_event:
+        so_nguoi_tham_gia = len(matched_event.attendees) if matched_event.attendees else 0
+        print(f"\n🔍 Thông tin sự kiện tìm thấy:")
+        print(f"ID: {matched_event.event_id}")
+        print(f"Tên: {matched_event.name}")
+        print(f"Ngày: {matched_event.date}")
+        print(f"Sức chứa: {matched_event.capacity}")
+        print(f"Số người tham gia: {so_nguoi_tham_gia}")
+        print(f"Tạo bởi: {getattr(matched_event, 'created_by', 'Không rõ')}")
+
+        # 🔎 Tìm organizer đang quản lý sự kiện này
+        organizers = load_data(USERS_FILE)
+        organizer_names = [
+            u['username']
+            for u in organizers
+            if u.get('role', '').lower() == 'organizer' and
+                event_id in u.get('assigned_events', [])
+        ]
+
+        if organizer_names:
+            print(f"Organizer được phân quyền: {', '.join(organizer_names)}")
+        else:
+            print("Không có organizer nào được phân quyền cho sự kiện này.")
+        print("-" * 40)
+    else:
+        print("❌ Không tìm thấy sự kiện với ID này.")
+
 
 def print_registered_events(username: str):
     print("\n📋 Danh sách sự kiện bạn đã đăng ký:\n")
@@ -98,18 +117,31 @@ def print_registered_events(username: str):
 def handle_update_event():
     print("\n--- Cập nhật sự kiện ---")
     event_id = input("Nhập ID sự kiện cần cập nhật: ").strip()
+    
+    if not event_id:
+        print("⚠️ Vui lòng nhập ID sự kiện.")
+        return
 
+    #  Lấy tất cả sự kiện và kiểm tra tồn tại
+    events = view_all_events()
+    matched_event = next((event for event in events if event.event_id == event_id), None)
+    if not matched_event:
+        print("❌ Không tìm thấy sự kiện với ID này.")
+        return
+
+    # 🔽 Nhập thông tin cập nhật
     new_name = input("Nhập tên mới (để trống nếu không thay đổi): ").strip()
     new_date = input("Nhập ngày mới (YYYY-MM-DD, để trống nếu không thay đổi): ").strip()
     new_capacity = input("Nhập sức chứa mới (để trống nếu không thay đổi): ").strip()
+    assign = input("Bạn có muốn gán sự kiện này cho organizer nào không? (nhập username hoặc Enter để bỏ qua): ").strip()
 
     new_data = {}
 
-    # Kiểm tra tên mới
+    # ✅ Kiểm tra tên mới
     if new_name:
         new_data["name"] = new_name
 
-    # Kiểm tra ngày mới
+    # ✅ Kiểm tra ngày mới
     if new_date:
         try:
             date_obj = datetime.strptime(new_date, "%Y-%m-%d")
@@ -121,30 +153,34 @@ def handle_update_event():
             print("⚠️ Ngày không hợp lệ. Vui lòng nhập đúng định dạng YYYY-MM-DD.")
             return
 
-    # Kiểm tra sức chứa mới
+    # ✅ Kiểm tra sức chứa mới
     if new_capacity:
         try:
-            new_capacity = int(new_capacity)
-            if new_capacity <= 0:
+            new_capacity_int = int(new_capacity)
+            if new_capacity_int <= 0:
                 print("⚠️ Sức chứa phải lớn hơn 0.")
                 return
-            new_data["capacity"] = new_capacity
+            new_data["capacity"] = new_capacity_int
         except ValueError:
             print("⚠️ Sức chứa phải là số nguyên.")
             return
 
-    if not new_data:
-        print("⚠️ Bạn chưa nhập thông tin mới để cập nhật.")
-        return
+    # ✅ Cập nhật nếu có dữ liệu
+    if new_data:
+        success = update_event(event_id, new_data)
+        if success:
+            print("✅ Cập nhật sự kiện thành công.")
+        else:
+            print("❌ Không thể cập nhật sự kiện.")
+            return
 
-    # Gọi backend để cập nhật
-    success = update_event(event_id, new_data)
-
-    if success:
-        print("✅ Cập nhật sự kiện thành công.")
-    else:
-        print("❌ Không tìm thấy sự kiện hoặc cập nhật thất bại.")
-
+    # ✅ Gán organizer nếu có
+    if assign:
+        success_assign = assign_event_to_organizer(assign, event_id)
+        if success_assign:
+            print(f"✅ Đã gán sự kiện '{event_id}' cho organizer '{assign}'.")
+        else:
+            print("❌ Gán thất bại. Organizer không tồn tại hoặc không hợp lệ.")
 
 def handle_view_all_events():
     events = services.view_all_events()
@@ -216,7 +252,6 @@ def handle_view_attendees_for_organizer(current_user):
 
 
 def show_admin_menu(current_user):
-    """(UI/UX - TV5) Hiển thị và điều hướng menu cho Admin."""
     while True:
         print(f"\n--- Menu Admin (Đăng nhập với tài khoản: {current_user.username}) ---")
         print("1. Tạo sự kiện mới")
@@ -265,7 +300,6 @@ def show_admin_menu(current_user):
 
 # ... Các hàm show_student_menu, show_organizer_menu ...
 def show_organizer_menu(current_user):
-    """(UI/UX - TV6) Hiển thị menu cho Event Organizer."""
     while True:
         print("\n===== EVENT ORGANIZER MENU =====")
         print("1. Xem danh sách người tham dự cho sự kiện")
@@ -329,9 +363,7 @@ def show_student_menu(current_user):
 # --- Hàm chạy chính của chương trình ---
 
 def main():
-    """Hàm chính để điều khiển toàn bộ luồng của ứng dụng."""
     current_user = None
-    
     # Tạo sẵn tài khoản admin nếu chưa có
     users = load_data(USERS_FILE)
     if not any(user['username'] == 'admin' for user in users):

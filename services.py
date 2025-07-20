@@ -7,7 +7,7 @@ from datetime import datetime  # để xử lý ngày giờ
 
 from models import User, Event
 from file_handler import load_data, save_data, USERS_FILE, EVENTS_FILE
-# ... (code các hàm logic của bạn)
+
 def register(username: str, password: str, role: str) -> bool:
     users = load_data(USERS_FILE)
 
@@ -126,11 +126,6 @@ def update_event(event_id: str, new_data: dict) -> bool:
     return updated
 
 def delete_event(event_id: str, current_user: User) -> bool:
-    """
-    (Backend - TV4) Xóa một sự kiện.
-    - Logic: Tìm và xóa sự kiện khỏi danh sách trong events.json.
-    - Trả về: True nếu xóa thành công, False nếu không tìm thấy ID.
-    """
     events = load_data(EVENTS_FILE)
     users = load_data(USERS_FILE)
     deleted = False
@@ -252,11 +247,6 @@ def get_events_by_organizer(organizer_username):
     return [Event(**e) for e in events if e.get('created_by') == organizer_username]
 
 def view_attendees_for_event(event_id: str) -> list[str] | None:
-    """
-    (Backend - TV4) Xem danh sách người tham dự của một sự kiện cụ thể.
-    - Logic: Tìm sự kiện theo ID và trả về danh sách 'attendees' của nó.
-    - Trả về: Một danh sách các username, hoặc None nếu không tìm thấy sự kiện.
-    """
 
     events = load_data(EVENTS_FILE)
     for event in events:
@@ -269,7 +259,6 @@ def view_attendees_for_event(event_id: str) -> list[str] | None:
 # --- Nhóm chức năng: Báo cáo & Thống kê (Dành cho TV2) ---
 
 def calculate_total_attendees() -> int:
-    """(Backend - TV2) Tính tổng số lượt đăng ký trên tất cả các sự kiện."""
     events = load_data(EVENTS_FILE)
     total = 0
     for event in events:
@@ -278,11 +267,6 @@ def calculate_total_attendees() -> int:
     return total
 
 def find_events_by_attendance() -> dict:
-    """
-    (Backend - TV2) Tìm sự kiện có số người tham dự cao nhất và thấp nhất.
-    - Trả về: Một dictionary, ví dụ: 
-    {"highest": {"name": ..., "count": ...}, "lowest": {"name": ..., "count": ...}}
-    """
     events = load_data(EVENTS_FILE)
     if not events:
         return {"highest": None, "lowest": None}
@@ -302,7 +286,6 @@ def find_events_by_attendance() -> dict:
     return {"highest": highest, "lowest": lowest}
 
 def export_to_csv():
-    """(Backend - TV2) Xuất báo cáo ra file CSV."""
     events = load_data(EVENTS_FILE)
     filename = "events_report.csv"
 
